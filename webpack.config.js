@@ -14,6 +14,7 @@ module.exports = {
         new HtmlWebpackPlugin({
             template: './src/index.html', // Template HTML de départ
             filename: 'index.html', // Nom du fichier HTML généré
+            inject: 'body', // Ajoute les scripts dans <body>
         }),
         new CopyWebpackPlugin({
             patterns: [

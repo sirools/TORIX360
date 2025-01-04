@@ -44,11 +44,17 @@ const textures = [];
     }
 
     // Charger toutes les textures
+    // Détecter l'environnement
+    const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+
+    // Définir la base des chemins
+    const basePath = isLocal ? './' : './dist/';
+
+    // Charger les textures avec le chemin correct
     Promise.all([
-        loadTexture('./dist/assets/images/artwork1.jpg'),
-        loadTexture('./dist/assets/images/artwork2.jpg'),
-        loadTexture('./dist/assets/images/artwork3.jpg'),
-        loadTexture('./dist/assets/images/artwork4.jpg'),
+        loadTexture(`${basePath}assets/images/artwork1.jpg`),
+        loadTexture(`${basePath}assets/images/artwork2.jpg`),
+        loadTexture(`${basePath}assets/images/artwork3.jpg`),
     ]).then((loadedTextures) => {
         loadedTextures.forEach((texture, index) => {
             textures[index] = texture;
@@ -58,6 +64,7 @@ const textures = [];
     }).catch((err) => {
         console.error("Erreur lors du chargement des textures :", err);
     });
+
 
 // Variables globales
 let currentIndex = 0;
