@@ -45,10 +45,10 @@ const textures = [];
 
     // Charger toutes les textures
     Promise.all([
-        loadTexture('./assets/images/artwork1.jpg'),
-        loadTexture('./assets/images/artwork2.jpg'),
-        loadTexture('./assets/images/artwork3.jpg'),
-        loadTexture('./assets/images/artwork4.jpg'),
+        loadTexture('./dist/assets/images/artwork1.jpg'),
+        loadTexture('./dist/assets/images/artwork2.jpg'),
+        loadTexture('./dist/assets/images/artwork3.jpg'),
+        loadTexture('./dist/assets/images/artwork4.jpg'),
     ]).then((loadedTextures) => {
         loadedTextures.forEach((texture, index) => {
             textures[index] = texture;
