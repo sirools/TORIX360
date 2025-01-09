@@ -1,23 +1,31 @@
 import * as THREE from 'three';
 
-export class AssetLoader {
-    constructor(basePath) {
-        this.textureLoader = new THREE.TextureLoader();
-        this.basePath = basePath;
-    }
+console.log('THREE version:', THREE.REVISION);
+// console.log('THREE exports:', Object.keys(THREE)); //ce qu'il y a comme objets dispo dans three 172
 
-    loadTextures(texturePaths) {
-        return Promise.all(
-            texturePaths.map((path) =>
-                new Promise((resolve, reject) => {
-                    this.textureLoader.load(
-                        this.basePath + path,
-                        resolve,
-                        undefined,
-                        reject
-                    );
-                })
-            )
+// Fonction pour charger une texture avec gestion d'encodage
+export function loadTexture(url) {
+    return new Promise((resolve, reject) => {
+        const textureLoader = new THREE.TextureLoader();
+        textureLoader.load(
+            url,
+            (texture) => {
+                // Appliquer l'encodage directement avec les identifiants numériques
+                texture.encoding = 3001; // 3001 pour sRGBEncoding
+
+                // Log de débogage pour vérifier l'encodage et la texture
+                console.log(`Texture chargée depuis ${url}`, {
+                    encoding: texture.encoding,
+                    texture,
+                });
+
+                resolve(texture);
+            },
+            undefined,
+            (err) => {
+                console.error(`Erreur lors du chargement de la texture depuis ${url}`, err);
+                reject(err);
+            }
         );
-    }
+    });
 }
