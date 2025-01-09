@@ -1,2 +1,38 @@
-<!doctype html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>360-Degree VR Experience</title><style>body { margin: 0; }
-        canvas { display: block; }</style></head><body><script defer="defer" src="./dist/main.js"></script></body></html>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>360-Degree VR Experience</title>
+    <style>
+        body { margin: 0; }
+        canvas { display: block; }
+    </style>
+<script defer src="./dist/main.js"></script></head>
+<body>
+    <!-- Le script sera injecté ici automatiquement -->
+    <div id="controls">
+    <button id="prevSphere">◀️ Précédent</button>
+    <button id="nextSphere">▶️ Suivant</button>
+    </div>
+    <style>
+        #controls {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 10px;
+        }
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            border: none;
+            background-color: #000;
+            color: #fff;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+</style>
+</body>
+</html>
