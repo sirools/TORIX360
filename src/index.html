@@ -11,5 +11,28 @@
 </head>
 <body>
     <!-- Le script sera injecté ici automatiquement -->
+    <div id="controls">
+    <button id="prevSphere">◀️ Précédent</button>
+    <button id="nextSphere">▶️ Suivant</button>
+    </div>
+    <style>
+        #controls {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 10px;
+        }
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            border: none;
+            background-color: #000;
+            color: #fff;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+</style>
 </body>
 </html>

@@ -7,7 +7,6 @@ import { interactionManager } from '@js/interactionManager.js';
 
 // Exemple de chargement
 const texturePath = './assets/images/artwork1.jpg';
-
 loadTexture(texturePath)
     .then((texture) => {
         console.log('Texture chargée et prête à être utilisée:', texture);
@@ -15,7 +14,6 @@ loadTexture(texturePath)
     .catch((err) => {
         console.error('Erreur lors du chargement de la texture:', err);
     });
-
 
 // Configuration de base
 const scene = new THREE.Scene();
@@ -66,6 +64,23 @@ Promise.all(texturePaths.map(loadTexture))
             } else if (event.key === 'ArrowLeft' && nextIndices.length > 1) {
                 sphereManager.navigateToSphere(nextIndices[1], 1000); // Naviguer vers la seconde sphère connectée
             }
+        });
+
+        // Naviguer entre les sphères sur mobile
+        document.getElementById("prevSphere").addEventListener("click", () => {
+            sphereManager.navigateToSphere(
+                sphereManager.currentIndex - 1 < 0 
+                    ? sphereManager.spheres.length - 1 
+                    : sphereManager.currentIndex - 1, 
+                1000
+            );
+        });
+
+        document.getElementById("nextSphere").addEventListener("click", () => {
+            sphereManager.navigateToSphere(
+                (sphereManager.currentIndex + 1) % sphereManager.spheres.length, 
+                1000
+            );
         });
 
         // Boucle d'animation
