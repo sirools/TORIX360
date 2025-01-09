@@ -27,10 +27,12 @@ module.exports = {
     plugins: [
         new HtmlWebpackPlugin({
             template: './src/index.html',
+            favicon: './src/favicon.ico', // Ligne ajoutée pour le favicon
         }),
         new CopyWebpackPlugin({
             patterns: [
                 { from: './src/assets', to: 'assets' }, // Copie les assets vers dist
+                { from: './src/favicon.ico', to: '' }, // Copie le favicon à la racine de dist
             ],
         }),
     ],
