@@ -35,7 +35,7 @@ module.exports = (env, argv) => {
             }),
             new CopyWebpackPlugin({
                 patterns: [
-                    { from: './src/assets', to: 'assets' }, // Copie les assets vers dist
+                    { from: './src/assets/images', to: 'assets/images' }, // Copie les assets vers dist
                     { from: './src/favicon.ico', to: '' }, // Copie le favicon à la racine de dist
                 ],
             }),
