@@ -18,6 +18,10 @@ export class SphereManager {
                 transparent: true,
                 opacity: index === 0 ? 1 : 0, // La première texture est visible
             });
+
+            // Ajoutez un log pour confirmer :
+            console.log(`Material ${index}:`, material);
+
             material.renderOrder = index;
             const sphere = new THREE.Mesh(this.sphereGeometry, material);
             this.scene.add(sphere);

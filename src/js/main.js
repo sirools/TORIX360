@@ -5,6 +5,13 @@ import { SphereManager } from '@js/sphereManager.js';
 import { transitionManager } from '@js/transitionManager.js';
 import { interactionManager } from '@js/interactionManager.js';
 
+// test shaders
+import { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer.js';
+import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass.js';
+import { ShaderPass } from 'three/examples/jsm/postprocessing/ShaderPass.js';
+import { BrightnessContrastShader } from 'three/examples/jsm/shaders/BrightnessContrastShader.js';
+
+
 // Exemple de chargement
 const texturePath = './assets/images/artwork1.jpg';
 loadTexture(texturePath)
@@ -25,6 +32,7 @@ camera.updateProjectionMatrix();
 const renderer = new THREE.WebGLRenderer({ antialias: true });
 renderer.setSize(window.innerWidth, window.innerHeight);
 renderer.setClearColor(0x000000, 1); // Définir le fond noir
+renderer.outputColorSpace = THREE.SRGBColorSpace; // Important pour gérer sRGB
 document.body.appendChild(renderer.domElement);
 
 // Détecter l'environnement
@@ -42,9 +50,35 @@ const texturePaths = [
     `${basePath}assets/images/artwork-final-V1.jpg`,
 ];
 
+
+// TEST SHADERS
+// Post-processing setup
+const composer = new EffectComposer(renderer);
+
+// Render pass : permet de rendre la scène de base
+const renderPass = new RenderPass(scene, camera);
+composer.addPass(renderPass);
+
+// Shader pass : applique BrightnessContrastShader
+const brightnessContrastPass = new ShaderPass(BrightnessContrastShader);
+brightnessContrastPass.uniforms.brightness.value = 0.0; // Ajuste la luminosité (-1 à 1)
+brightnessContrastPass.uniforms.contrast.value = 0.0; // Ajuste le contraste (-1 à 1)
+composer.addPass(brightnessContrastPass);
+
+// Slider pour ajuster le contraste
+// const contrastSlider = document.getElementById('contrastSlider');
+// contrastSlider.addEventListener('input', (event) => {
+//     const value = parseFloat(event.target.value);
+//     brightnessContrastPass.uniforms.contrast.value = value;
+//     console.log(`Contraste ajusté : ${value}`);
+// });
+
+
+
 // Charger les textures et initialiser les sphères
 Promise.all(texturePaths.map(loadTexture))
     .then((loadedTextures) => {
+        // Passez le renderer en tant qu'argument
         const sphereManager = new SphereManager(scene, loadedTextures);
         sphereManager.createSpheres();
 
@@ -107,7 +141,8 @@ function initControls() {
 // Animation
 function animate() {
     requestAnimationFrame(animate);
-    renderer.render(scene, camera);
+    //renderer.render(scene, camera);
+    composer.render(); // Utilise le composer au lieu de renderer
 }
 
 // Ajuster la taille au redimensionnement de la fenêtre

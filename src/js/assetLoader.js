@@ -12,6 +12,7 @@ export function loadTexture(url) {
             (texture) => {
                 // Appliquer l'encodage directement avec les identifiants numériques
                 texture.encoding = 3001; // 3001 pour sRGBEncoding
+                console.log(`Texture encoding pour ${url}:`, texture.encoding);
 
                 // Log de débogage pour vérifier l'encodage et la texture
                 console.log(`Texture chargée depuis ${url}`, {
