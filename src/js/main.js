@@ -2,25 +2,12 @@ import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import { loadTexture } from '@js/assetLoader.js';
 import { SphereManager } from '@js/sphereManager.js';
-import { transitionManager } from '@js/transitionManager.js';
-import { interactionManager } from '@js/interactionManager.js';
 
-// test shaders
+// Postprocessing
 import { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer.js';
 import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass.js';
 import { ShaderPass } from 'three/examples/jsm/postprocessing/ShaderPass.js';
 import { BrightnessContrastShader } from 'three/examples/jsm/shaders/BrightnessContrastShader.js';
-
-
-// Exemple de chargement
-const texturePath = './assets/images/artwork1.jpg';
-loadTexture(texturePath)
-    .then((texture) => {
-        console.log('Texture chargée et prête à être utilisée:', texture);
-    })
-    .catch((err) => {
-        console.error('Erreur lors du chargement de la texture:', err);
-    });
 
 // Configuration de base
 const scene = new THREE.Scene();
@@ -31,14 +18,30 @@ camera.updateProjectionMatrix();
 
 const renderer = new THREE.WebGLRenderer({ antialias: true });
 renderer.setSize(window.innerWidth, window.innerHeight);
-renderer.setClearColor(0x000000, 1); // Définir le fond noir
-renderer.outputColorSpace = THREE.SRGBColorSpace; // Important pour gérer sRGB
+renderer.setClearColor(0x000000, 1);
+renderer.outputColorSpace = THREE.SRGBColorSpace;
 document.body.appendChild(renderer.domElement);
+
+// Initialisation des OrbitControls
+const controls = new OrbitControls(camera, renderer.domElement);
+controls.enableDamping = true;
+controls.dampingFactor = 0.05;
+controls.minDistance = 10;
+controls.maxDistance = 480;
+controls.zoomSpeed = 2;
+
+// Postprocessing
+const composer = new EffectComposer(renderer);
+const renderPass = new RenderPass(scene, camera);
+composer.addPass(renderPass);
+
+const brightnessContrastPass = new ShaderPass(BrightnessContrastShader);
+brightnessContrastPass.uniforms.brightness.value = 0.0;
+brightnessContrastPass.uniforms.contrast.value = 0.0;
+composer.addPass(brightnessContrastPass);
 
 // Détecter l'environnement
 const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
-
-// Définir la base des chemins
 const basePath = isLocal ? './' : './dist/';
 
 // Tableau des chemins des textures
@@ -50,107 +53,60 @@ const texturePaths = [
     `${basePath}assets/images/artwork-final-V1.jpg`,
 ];
 
-
-// TEST SHADERS
-// Post-processing setup
-const composer = new EffectComposer(renderer);
-
-// Render pass : permet de rendre la scène de base
-const renderPass = new RenderPass(scene, camera);
-composer.addPass(renderPass);
-
-// Shader pass : applique BrightnessContrastShader
-const brightnessContrastPass = new ShaderPass(BrightnessContrastShader);
-brightnessContrastPass.uniforms.brightness.value = 0.0; // Ajuste la luminosité (-1 à 1)
-brightnessContrastPass.uniforms.contrast.value = 0.0; // Ajuste le contraste (-1 à 1)
-composer.addPass(brightnessContrastPass);
-
-// Slider pour ajuster le contraste
-// const contrastSlider = document.getElementById('contrastSlider');
-// contrastSlider.addEventListener('input', (event) => {
-//     const value = parseFloat(event.target.value);
-//     brightnessContrastPass.uniforms.contrast.value = value;
-//     console.log(`Contraste ajusté : ${value}`);
-// });
-
-
-
 // Charger les textures et initialiser les sphères
 Promise.all(texturePaths.map(loadTexture))
     .then((loadedTextures) => {
-        // Passez le renderer en tant qu'argument
-        const sphereManager = new SphereManager(scene, loadedTextures);
+        const sphereManager = new SphereManager(scene, loadedTextures, renderer);
+
         sphereManager.createSpheres();
 
-        // Matrice d'adjacence pour définir les connexions logiques entre sphères
         const adjacencyMatrix = [
-            [1, 2],    // La sphère 0 est connectée aux sphères 1 et 2
-            [0, 3],    // La sphère 1 est connectée aux sphères 0 et 3
-            [0, 3],    // La sphère 2 est connectée aux sphères 0 et 3
-            [1, 2, 4], // La sphère 3 est connectée aux sphères 1, 2 et 4
-            [3],       // La sphère 4 est connectée uniquement à la sphère 3
+            [1, 2],
+            [0, 3],
+            [0, 3],
+            [1, 2, 4],
+            [3],
         ];
         sphereManager.setAdjacencyMatrix(adjacencyMatrix);
 
         // Gestion des transitions avec les touches du clavier
         document.addEventListener('keydown', (event) => {
             if (event.key === 'ArrowRight') {
-                const nextIndex = (sphereManager.currentIndex + 1) % sphereManager.spheres.length; // Passer à la sphère suivante
+                const nextIndex = (sphereManager.currentIndex + 1) % sphereManager.spheres.length;
                 sphereManager.navigateToSphere(nextIndex, 1000);
             } else if (event.key === 'ArrowLeft') {
-                const prevIndex = (sphereManager.currentIndex - 1 + sphereManager.spheres.length) % sphereManager.spheres.length; // Revenir à la sphère précédente
+                const prevIndex = (sphereManager.currentIndex - 1 + sphereManager.spheres.length) % sphereManager.spheres.length;
                 sphereManager.navigateToSphere(prevIndex, 1000);
             }
         });
 
         // Naviguer entre les sphères sur mobile
-        document.getElementById("prevSphere").addEventListener("click", () => {
-            sphereManager.navigateToSphere(
-                sphereManager.currentIndex - 1 < 0 
-                    ? sphereManager.spheres.length - 1 
-                    : sphereManager.currentIndex - 1, 
-                1000
-            );
+        document.getElementById('prevSphere').addEventListener('click', () => {
+            const prevIndex = (sphereManager.currentIndex - 1 + sphereManager.spheres.length) % sphereManager.spheres.length;
+            sphereManager.navigateToSphere(prevIndex, 1000);
         });
 
-        document.getElementById("nextSphere").addEventListener("click", () => {
-            sphereManager.navigateToSphere(
-                (sphereManager.currentIndex + 1) % sphereManager.spheres.length, 
-                1000
-            );
+        document.getElementById('nextSphere').addEventListener('click', () => {
+            const nextIndex = (sphereManager.currentIndex + 1) % sphereManager.spheres.length;
+            sphereManager.navigateToSphere(nextIndex, 1000);
         });
 
-        // Boucle d'animation
         animate();
     })
     .catch((err) => {
-        console.error("Erreur lors du chargement des textures :", err);
+        console.error('Erreur lors du chargement des textures :', err);
     });
-
-// Initialisation des OrbitControls
-function initControls() {
-    const controls = new OrbitControls(camera, renderer.domElement);
-    controls.enableDamping = true;
-    controls.dampingFactor = 0.05;
-    controls.minDistance = 10;
-    controls.maxDistance = 480;
-    controls.zoomSpeed = 2;
-    controls.update(); // Mettre à jour à chaque frame
-}
 
 // Animation
 function animate() {
     requestAnimationFrame(animate);
-    //renderer.render(scene, camera);
-    composer.render(); // Utilise le composer au lieu de renderer
+    controls.update(); // Assure la mise à jour des OrbitControls
+    composer.render();
 }
 
-// Ajuster la taille au redimensionnement de la fenêtre
 window.addEventListener('resize', () => {
     camera.aspect = window.innerWidth / window.innerHeight;
     camera.updateProjectionMatrix();
     renderer.setSize(window.innerWidth, window.innerHeight);
+    composer.setSize(window.innerWidth, window.innerHeight);
 });
-
-// Initialisation
-initControls();

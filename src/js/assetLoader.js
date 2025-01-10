@@ -1,7 +1,6 @@
 import * as THREE from 'three';
 
 console.log('THREE version:', THREE.REVISION);
-// console.log('THREE exports:', Object.keys(THREE)); //ce qu'il y a comme objets dispo dans three 172
 
 // Fonction pour charger une texture avec gestion d'encodage
 export function loadTexture(url) {
@@ -25,8 +24,13 @@ export function loadTexture(url) {
             undefined,
             (err) => {
                 console.error(`Erreur lors du chargement de la texture depuis ${url}`, err);
-                reject(err);
+
+                // Rejeter la promesse avec une erreur informative
+                reject(new Error(`Erreur critique lors du chargement de ${url}: ${err.message}`));
             }
         );
+    }).catch((error) => {
+        // Gérer les erreurs critiques
+        console.error(`Erreur générale lors du chargement de ${url}:`, error);
     });
 }
