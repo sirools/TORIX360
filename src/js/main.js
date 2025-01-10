@@ -1,25 +1,26 @@
 import * as THREE from 'three';
 import { loadTexture } from '@js/assetLoader.js';
+import { load3DModel } from './assetLoader.js';
 import { SphereManager } from '@js/sphereManager.js';
 import { InteractionManager } from '@js/interactionManager.js';
 import { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer.js';
 import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass.js';
 import { ShaderPass } from 'three/examples/jsm/postprocessing/ShaderPass.js';
 import { BrightnessContrastShader } from 'three/examples/jsm/shaders/BrightnessContrastShader.js';
+import { Interactive3DAsset } from './interactive3DAsset.js';
 
-// Détection des environnements
+// Constantes de l'environnement
 const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
 const isProd = !isLocal;
-
-// Définition du chemin de base en fonction de l'environnement
 const basePath = isProd ? '/TORIX360/dist/assets/images/' : './assets/images/';
 
-// Tableau des chemins des textures
+// Tableau des textures
 const texturePaths = [
     `${basePath}artwork1.jpg`,
     `${basePath}artwork2.jpg`,
     `${basePath}artwork3.jpg`,
     `${basePath}artwork4.jpg`,
+    `${basePath}artwork5.jpg`,
     `${basePath}artwork-final-V1.jpg`,
 ];
 
@@ -30,41 +31,78 @@ camera.position.z = 480;
 
 const renderer = new THREE.WebGLRenderer({ antialias: true });
 renderer.setSize(window.innerWidth, window.innerHeight);
-renderer.setClearColor(0x000000, 1); // Fond noir
+renderer.setClearColor(0x000000, 1);
 renderer.outputColorSpace = THREE.SRGBColorSpace;
 document.body.appendChild(renderer.domElement);
 
 // Postprocessing
 const composer = new EffectComposer(renderer);
-const renderPass = new RenderPass(scene, camera);
-composer.addPass(renderPass);
-
+composer.addPass(new RenderPass(scene, camera));
 const brightnessContrastPass = new ShaderPass(BrightnessContrastShader);
-brightnessContrastPass.uniforms.brightness.value = 0.0; // Ajuste la luminosité
-brightnessContrastPass.uniforms.contrast.value = 0.0; // Ajuste le contraste
+brightnessContrastPass.uniforms.brightness.value = 0.0;
+brightnessContrastPass.uniforms.contrast.value = 0.0;
 composer.addPass(brightnessContrastPass);
 
-// Charger les textures et initialiser les sphères
-Promise.all(texturePaths.map(loadTexture))
-    .then((loadedTextures) => {
-        const sphereManager = new SphereManager(scene, loadedTextures, renderer);
-        sphereManager.createSpheres();
+// Fonction principale pour démarrer le projet
+function initialize() {
+    // Charger les textures et initialiser la scène
+    loadTextures(texturePaths)
+        .then(loadedTextures => {
+            const sphereManager = initializeSpheres(loadedTextures);
+            const interactionManager = new InteractionManager(camera, renderer, sphereManager);
+            interactionManager.initializeInteractions();
+            loadAndPosition3DAssets();
+            animate(interactionManager);
+        })
+        .catch(err => {
+            console.error('Erreur lors du chargement des textures :', err);
+        });
+}
 
-        // Initialiser le gestionnaire d'interactions
-        const interactionManager = new InteractionManager(camera, renderer, sphereManager);
-        interactionManager.initializeInteractions();
+// Charger les textures
+function loadTextures(paths) {
+    return Promise.all(paths.map(loadTexture));
+}
 
-        animate(interactionManager); // Passer l'InteractionManager à la boucle d'animation
-    })
-    .catch((err) => {
-        console.error('Erreur lors du chargement des textures :', err);
+// Créer et positionner les sphères dans la scène
+function initializeSpheres(loadedTextures) {
+    const sphereManager = new SphereManager(scene, loadedTextures, renderer);
+    sphereManager.createSpheres();
+    return sphereManager;
+}
+
+// Charger et positionner les modèles 3D dans la scène
+function loadAndPosition3DAssets() {
+    const modelPaths = ['./assets/models/champagne.gltf', './assets/models/pearl.gltf'];
+    const radius = 500;
+    const numObjects = 2;
+    const angleStep = Math.PI * 2 / numObjects;
+    const verticalAngleStep = Math.PI / 3;
+
+    modelPaths.forEach((path, index) => {
+        load3DModel(path).then((model) => {
+            const angle = angleStep * index;
+            const verticalAngle = (index % 2 === 0 ? verticalAngleStep : -verticalAngleStep); // Alternance de la position verticale
+
+            model.position.set(
+                radius * Math.cos(angle) * Math.cos(verticalAngle),
+                radius * Math.sin(verticalAngle),
+                radius * Math.sin(angle) * Math.cos(verticalAngle)
+            );
+
+            model.scale.set(50, 50, 50);
+            scene.add(model);
+        }).catch((error) => {
+            console.error(`Erreur lors du chargement du modèle ${path}:`, error);
+        });
     });
+}
 
 // Boucle d'animation
 function animate(interactionManager) {
     requestAnimationFrame(() => animate(interactionManager));
-    interactionManager.update(); // Mise à jour des OrbitControls via InteractionManager
-    composer.render(); // Utilise le composer pour le rendu
+    interactionManager.update();
+    composer.render();
 }
 
 // Gestion du redimensionnement
@@ -74,3 +112,6 @@ window.addEventListener('resize', () => {
     renderer.setSize(window.innerWidth, window.innerHeight);
     composer.setSize(window.innerWidth, window.innerHeight);
 });
+
+// Lancer l'application
+initialize();
