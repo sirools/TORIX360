@@ -12,13 +12,19 @@ renderer.setSize(window.innerWidth, window.innerHeight);
 renderer.setClearColor(0x000000, 1); // Fond noir
 document.body.appendChild(renderer.domElement);
 
-// Charger les textures et initialiser les sphères
+// Détecter l'environnement
+const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+
+// Définir la base des chemins
+const basePath = isLocal ? './' : '/TORIX360/';
+
+// Tableau des chemins des textures
 const texturePaths = [
-    './assets/images/artwork1.jpg',
-    './assets/images/artwork2.jpg',
-    './assets/images/artwork3.jpg',
-    './assets/images/artwork4.jpg',
-    './assets/images/artwork-final-V1.jpg',
+    `${basePath}assets/images/artwork1.jpg`,
+    `${basePath}assets/images/artwork2.jpg`,
+    `${basePath}assets/images/artwork3.jpg`,
+    `${basePath}assets/images/artwork4.jpg`,
+    `${basePath}assets/images/artwork-final-V1.jpg`,
 ];
 
 Promise.all(texturePaths.map(loadTexture))
