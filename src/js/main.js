@@ -1,7 +1,7 @@
 import * as THREE from 'three';
-import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import { loadTexture } from '@js/assetLoader.js';
 import { SphereManager } from '@js/sphereManager.js';
+import { InteractionManager } from '@js/interactionManager.js';
 import { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer.js';
 import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass.js';
 import { ShaderPass } from 'three/examples/jsm/postprocessing/ShaderPass.js';
@@ -34,14 +34,6 @@ renderer.setClearColor(0x000000, 1); // Fond noir
 renderer.outputColorSpace = THREE.SRGBColorSpace;
 document.body.appendChild(renderer.domElement);
 
-// Initialisation des OrbitControls
-const controls = new OrbitControls(camera, renderer.domElement);
-controls.enableDamping = true;
-controls.dampingFactor = 0.05;
-controls.minDistance = 10;
-controls.maxDistance = 480;
-controls.zoomSpeed = 2;
-
 // Postprocessing
 const composer = new EffectComposer(renderer);
 const renderPass = new RenderPass(scene, camera);
@@ -58,18 +50,20 @@ Promise.all(texturePaths.map(loadTexture))
         const sphereManager = new SphereManager(scene, loadedTextures, renderer);
         sphereManager.createSpheres();
 
-        // Ajouter la logique des interactions et des transitions ici si nécessaire
+        // Initialiser le gestionnaire d'interactions
+        const interactionManager = new InteractionManager(camera, renderer, sphereManager);
+        interactionManager.initializeInteractions();
 
-        animate();
+        animate(interactionManager); // Passer l'InteractionManager à la boucle d'animation
     })
     .catch((err) => {
         console.error('Erreur lors du chargement des textures :', err);
     });
 
 // Boucle d'animation
-function animate() {
-    requestAnimationFrame(animate);
-    controls.update(); // Mise à jour des OrbitControls
+function animate(interactionManager) {
+    requestAnimationFrame(() => animate(interactionManager));
+    interactionManager.update(); // Mise à jour des OrbitControls via InteractionManager
     composer.render(); // Utilise le composer pour le rendu
 }
 
