@@ -7,12 +7,26 @@ import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass.js';
 import { ShaderPass } from 'three/examples/jsm/postprocessing/ShaderPass.js';
 import { BrightnessContrastShader } from 'three/examples/jsm/shaders/BrightnessContrastShader.js';
 
-// Configuration de base
+// Détection des environnements
+const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+const isProd = !isLocal;
+
+// Définition du chemin de base en fonction de l'environnement
+const basePath = isProd ? '/TORIX360/dist/assets/images/' : './assets/images/';
+
+// Tableau des chemins des textures
+const texturePaths = [
+    `${basePath}artwork1.jpg`,
+    `${basePath}artwork2.jpg`,
+    `${basePath}artwork3.jpg`,
+    `${basePath}artwork4.jpg`,
+    `${basePath}artwork-final-V1.jpg`,
+];
+
+// Configuration Three.js
 const scene = new THREE.Scene();
 const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
 camera.position.z = 480;
-camera.fov = 50;
-camera.updateProjectionMatrix();
 
 const renderer = new THREE.WebGLRenderer({ antialias: true });
 renderer.setSize(window.innerWidth, window.innerHeight);
@@ -38,55 +52,13 @@ brightnessContrastPass.uniforms.brightness.value = 0.0; // Ajuste la luminosité
 brightnessContrastPass.uniforms.contrast.value = 0.0; // Ajuste le contraste
 composer.addPass(brightnessContrastPass);
 
-// Détecter l'environnement
-const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
-const basePath = isLocal ? './' : '/TORIX360/dist/';
-
-const texturePaths = [
-    `${basePath}assets/images/artwork1.jpg`,
-    `${basePath}assets/images/artwork2.jpg`,
-    `${basePath}assets/images/artwork3.jpg`,
-    `${basePath}assets/images/artwork4.jpg`,
-    `${basePath}assets/images/artwork-final-V1.jpg`,
-];
-
 // Charger les textures et initialiser les sphères
 Promise.all(texturePaths.map(loadTexture))
     .then((loadedTextures) => {
         const sphereManager = new SphereManager(scene, loadedTextures, renderer);
-
         sphereManager.createSpheres();
 
-        const adjacencyMatrix = [
-            [1, 2],
-            [0, 3],
-            [0, 3],
-            [1, 2, 4],
-            [3],
-        ];
-        sphereManager.setAdjacencyMatrix(adjacencyMatrix);
-
-        // Gestion des transitions avec les touches du clavier
-        document.addEventListener('keydown', (event) => {
-            if (event.key === 'ArrowRight') {
-                const nextIndex = (sphereManager.currentIndex + 1) % sphereManager.spheres.length;
-                sphereManager.navigateToSphere(nextIndex, 1000);
-            } else if (event.key === 'ArrowLeft') {
-                const prevIndex = (sphereManager.currentIndex - 1 + sphereManager.spheres.length) % sphereManager.spheres.length;
-                sphereManager.navigateToSphere(prevIndex, 1000);
-            }
-        });
-
-        // Naviguer entre les sphères sur mobile
-        document.getElementById('prevSphere').addEventListener('click', () => {
-            const prevIndex = (sphereManager.currentIndex - 1 + sphereManager.spheres.length) % sphereManager.spheres.length;
-            sphereManager.navigateToSphere(prevIndex, 1000);
-        });
-
-        document.getElementById('nextSphere').addEventListener('click', () => {
-            const nextIndex = (sphereManager.currentIndex + 1) % sphereManager.spheres.length;
-            sphereManager.navigateToSphere(nextIndex, 1000);
-        });
+        // Ajouter la logique des interactions et des transitions ici si nécessaire
 
         animate();
     })
