@@ -44,15 +44,17 @@ composer.addPass(brightnessContrastPass);
 const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
 
 // Définir la base des chemins
-const basePath = isLocal ? './assets/images/' : './TORIX360/assets/images/';
+const basePath = isLocal 
+    ? './' 
+    : '/TORIX360/'; // Assurez-vous que "TORIX360" est le nom exact de votre dépôt GitHub
 
 // Tableau des chemins des textures
 const texturePaths = [
-    `${basePath}artwork1.jpg`,
-    `${basePath}artwork2.jpg`,
-    `${basePath}artwork3.jpg`,
-    `${basePath}artwork4.jpg`,
-    `${basePath}artwork-final-V1.jpg`,
+    `${basePath}assets/images/artwork1.jpg`,
+    `${basePath}assets/images/artwork2.jpg`,
+    `${basePath}assets/images/artwork3.jpg`,
+    `${basePath}assets/images/artwork4.jpg`,
+    `${basePath}assets/images/artwork-final-V1.jpg`,
 ];
 
 // Charger les textures et initialiser les sphères
