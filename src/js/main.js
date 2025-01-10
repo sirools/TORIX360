@@ -42,11 +42,7 @@ composer.addPass(brightnessContrastPass);
 
 // Détecter l'environnement
 const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
-
-// Définir la base des chemins
-const basePath = isLocal 
-    ? './' 
-    : '/TORIX360/'; // Assurez-vous que "TORIX360" est le nom exact de votre dépôt GitHub
+const basePath = isLocal ? './' : '/TORIX360/';
 
 // Tableau des chemins des textures
 const texturePaths = [

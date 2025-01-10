@@ -9,15 +9,14 @@ export function loadTexture(url) {
         textureLoader.load(
             url,
             (texture) => {
-                texture.encoding = 3001; // sRGBEncoding
-                console.log(`Texture encoding pour ${url}:`, texture.encoding);
+                texture.encoding = 3001; // Encoding correct
                 console.log(`Texture chargée depuis ${url}`, texture);
                 resolve(texture);
             },
             undefined,
             (err) => {
                 console.error(`Erreur lors du chargement de la texture depuis ${url}`, err);
-                reject(new Error(`Erreur critique lors du chargement de ${url}: ${err.message}`));
+                reject(err);
             }
         );
     });
