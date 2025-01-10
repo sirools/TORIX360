@@ -40,9 +40,8 @@ composer.addPass(brightnessContrastPass);
 
 // Détecter l'environnement
 const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
-const basePath = isLocal ? './' : '/TORIX360/';
+const basePath = isLocal ? './' : '/TORIX360/dist/';
 
-// Tableau des chemins des textures
 const texturePaths = [
     `${basePath}assets/images/artwork1.jpg`,
     `${basePath}assets/images/artwork2.jpg`,
