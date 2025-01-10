@@ -10,7 +10,7 @@ module.exports = (env, argv) => {
         output: {
             filename: 'main.js',
             path: path.resolve(__dirname, 'dist'),
-            publicPath: isProd ? '/TORIX360/' : '/', // Utilise un chemin adapté à l'environnement
+            publicPath: isProd ? '/TORIX360/dist/' : '/', // Inclut 'dist' en production
             clean: true,
         },
         resolve: {
@@ -31,12 +31,11 @@ module.exports = (env, argv) => {
         plugins: [
             new HtmlWebpackPlugin({
                 template: './src/index.html',
-                favicon: './src/favicon.ico', // Inclut le favicon dans le fichier HTML généré
+                favicon: './src/favicon.ico',
             }),
             new CopyWebpackPlugin({
                 patterns: [
                     { from: './src/assets', to: 'assets' }, // Copie les assets vers dist
-                    { from: './src/favicon.ico', to: '' }, // Copie le favicon à la racine de dist
                 ],
             }),
         ],
@@ -45,9 +44,9 @@ module.exports = (env, argv) => {
                 directory: path.resolve(__dirname, 'dist'),
             },
             compress: true,
-            port: 8080, // Port pour le serveur local
-            open: true, // Ouvre automatiquement le navigateur
+            port: 8080,
+            open: true,
         },
-        mode: argv.mode || 'development', // Définit le mode par défaut à développement
+        mode: argv.mode || 'development',
     };
 };
