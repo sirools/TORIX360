@@ -10,7 +10,7 @@ module.exports = (env, argv) => {
         output: {
             filename: 'main.js',
             path: path.resolve(__dirname, 'dist'),
-            publicPath: isProd ? '/TORIX360/dist/' : '/', // Chemin public pour prod ou dev
+            publicPath: isProd ? '/TORIX360/' : '/', // Chemin correct pour GitHub Pages
             clean: true,
         },
         resolve: {
