@@ -2,37 +2,21 @@ import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import { loadTexture } from '@js/assetLoader.js';
 import { SphereManager } from '@js/sphereManager.js';
-
-<<<<<<< HEAD
-=======
-// Postprocessing
 import { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer.js';
 import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass.js';
 import { ShaderPass } from 'three/examples/jsm/postprocessing/ShaderPass.js';
 import { BrightnessContrastShader } from 'three/examples/jsm/shaders/BrightnessContrastShader.js';
 
->>>>>>> main
 // Configuration de base
 const scene = new THREE.Scene();
 const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
 camera.position.z = 480;
-<<<<<<< HEAD
-const renderer = new THREE.WebGLRenderer({ antialias: true });
-renderer.setSize(window.innerWidth, window.innerHeight);
-renderer.setClearColor(0x000000, 1); // Fond noir
-document.body.appendChild(renderer.domElement);
-
-// Détecter l'environnement
-const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
-
-// Définir la base des chemins
-=======
 camera.fov = 50;
 camera.updateProjectionMatrix();
 
 const renderer = new THREE.WebGLRenderer({ antialias: true });
 renderer.setSize(window.innerWidth, window.innerHeight);
-renderer.setClearColor(0x000000, 1);
+renderer.setClearColor(0x000000, 1); // Fond noir
 renderer.outputColorSpace = THREE.SRGBColorSpace;
 document.body.appendChild(renderer.domElement);
 
@@ -50,13 +34,12 @@ const renderPass = new RenderPass(scene, camera);
 composer.addPass(renderPass);
 
 const brightnessContrastPass = new ShaderPass(BrightnessContrastShader);
-brightnessContrastPass.uniforms.brightness.value = 0.0;
-brightnessContrastPass.uniforms.contrast.value = 0.0;
+brightnessContrastPass.uniforms.brightness.value = 0.0; // Ajuste la luminosité
+brightnessContrastPass.uniforms.contrast.value = 0.0; // Ajuste le contraste
 composer.addPass(brightnessContrastPass);
 
 // Détecter l'environnement
 const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
->>>>>>> main
 const basePath = isLocal ? './' : '/TORIX360/';
 
 // Tableau des chemins des textures
@@ -68,30 +51,6 @@ const texturePaths = [
     `${basePath}assets/images/artwork-final-V1.jpg`,
 ];
 
-<<<<<<< HEAD
-Promise.all(texturePaths.map(loadTexture))
-    .then((loadedTextures) => {
-        const sphereManager = new SphereManager(scene, loadedTextures, renderer);
-        sphereManager.createSpheres();
-        // Ajouter d'autres logiques ou contrôles ici
-        animate();
-    })
-    .catch((err) => {
-        console.error("Erreur lors du chargement des textures :", err);
-    });
-
-// Initialisation des OrbitControls
-const controls = new OrbitControls(camera, renderer.domElement);
-controls.enableDamping = true;
-
-// Boucle d'animation
-function animate() {
-    requestAnimationFrame(animate);
-    renderer.render(scene, camera);
-}
-
-// Gestion du redimensionnement
-=======
 // Charger les textures et initialiser les sphères
 Promise.all(texturePaths.map(loadTexture))
     .then((loadedTextures) => {
@@ -136,20 +95,17 @@ Promise.all(texturePaths.map(loadTexture))
         console.error('Erreur lors du chargement des textures :', err);
     });
 
-// Animation
+// Boucle d'animation
 function animate() {
     requestAnimationFrame(animate);
-    controls.update(); // Assure la mise à jour des OrbitControls
-    composer.render();
+    controls.update(); // Mise à jour des OrbitControls
+    composer.render(); // Utilise le composer pour le rendu
 }
 
->>>>>>> main
+// Gestion du redimensionnement
 window.addEventListener('resize', () => {
     camera.aspect = window.innerWidth / window.innerHeight;
     camera.updateProjectionMatrix();
     renderer.setSize(window.innerWidth, window.innerHeight);
-<<<<<<< HEAD
-=======
     composer.setSize(window.innerWidth, window.innerHeight);
->>>>>>> main
 });

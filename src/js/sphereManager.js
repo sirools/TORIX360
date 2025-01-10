@@ -7,12 +7,9 @@ export class SphereManager {
         this.renderer = renderer;
         this.spheres = [];
         this.currentIndex = 0;
-<<<<<<< HEAD
-=======
-        this.adjacencyMatrix = [];
+        this.adjacencyMatrix = []; // Matrice d'adjacence pour les connexions logiques
         this.sphereGeometry = new THREE.SphereGeometry(500, 60, 40);
-        this.sphereGeometry.scale(-1, 1, 1);
->>>>>>> main
+        this.sphereGeometry.scale(-1, 1, 1); // Vue interne
     }
 
     createSpheres() {
@@ -20,28 +17,25 @@ export class SphereManager {
             const material = new THREE.MeshBasicMaterial({
                 map: texture,
                 transparent: true,
-                opacity: index === 0 ? 1 : 0,
+                opacity: index === 0 ? 1 : 0, // La première texture est visible
             });
-<<<<<<< HEAD
-            const sphere = new THREE.Mesh(new THREE.SphereGeometry(500, 60, 40), material);
-            sphere.geometry.scale(-1, 1, 1);
-=======
+
             material.renderOrder = index;
             const sphere = new THREE.Mesh(this.sphereGeometry, material);
->>>>>>> main
             this.scene.add(sphere);
             return sphere;
         });
     }
-<<<<<<< HEAD
-=======
 
     updateSphereOpacity(index, opacity) {
         if (this.spheres[index]) {
             this.spheres[index].material.opacity = opacity;
+        } else {
+            console.warn(`Sphère à l'indice ${index} introuvable.`);
         }
     }
 
+    // Fonction easing pour des transitions fluides
     static easeInOut(t) {
         return t < 0.5 ? 2 * t * t : -1 + (4 - 2 * t) * t;
     }
@@ -62,6 +56,7 @@ export class SphereManager {
                 requestAnimationFrame(animateFade);
             } else {
                 this.currentIndex = nextIndex;
+                console.log(`Transition terminée vers la sphère ${this.currentIndex}`);
             }
         };
 
@@ -79,7 +74,8 @@ export class SphereManager {
     navigateToSphere(nextIndex, duration) {
         if (this.spheres[nextIndex]) {
             this.crossfadeTransition(duration);
+        } else {
+            console.warn(`Aucune sphère à l'indice ${nextIndex}`);
         }
     }
->>>>>>> main
 }

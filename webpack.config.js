@@ -2,51 +2,15 @@ const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
 
-<<<<<<< HEAD
-module.exports = {
-    entry: './src/js/main.js',
-    output: {
-        filename: 'main.js',
-        path: path.resolve(__dirname, 'dist'),
-        clean: true,
-    },
-    resolve: {
-        extensions: ['.js'],
-        alias: {
-            '@js': path.resolve(__dirname, 'src/js'), // Alias pour le répertoire JS
-        },
-    },
-    module: {
-        rules: [
-            {
-                test: /\.js$/,
-                exclude: /node_modules/,
-                use: 'babel-loader',
-            },
-        ],
-    },
-    plugins: [
-        new HtmlWebpackPlugin({
-            template: './src/index.html',
-            favicon: './src/favicon.ico',
-        }),
-        new CopyWebpackPlugin({
-            patterns: [
-                { from: './src/assets', to: 'assets' }, // Copie les assets vers dist
-            ],
-        }),
-    ],
-    mode: 'development', // ou 'production' selon vos besoins
-=======
 module.exports = (env, argv) => {
-    const isProd = argv.mode === 'production'; // Vérifie si le mode est production
+    const isProd = argv && argv.mode === 'production'; // Vérifie si le mode est production
 
     return {
         entry: './src/js/main.js',
         output: {
             filename: 'main.js',
             path: path.resolve(__dirname, 'dist'),
-            publicPath: isProd ? '/TORIX360/' : '/', // Utilise un chemin adapté à l'environnement
+            publicPath: isProd ? '/TORIX360/' : '/', // Chemin adapté à l'environnement
             clean: true,
         },
         resolve: {
@@ -84,7 +48,6 @@ module.exports = (env, argv) => {
             port: 8080, // Port pour le serveur local
             open: true, // Ouvre automatiquement le navigateur
         },
-        mode: argv.mode || 'development', // Définit le mode par défaut à développement
+        mode: argv && argv.mode || 'development', // Définit le mode par défaut à développement
     };
->>>>>>> main
 };
