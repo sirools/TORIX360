@@ -39,6 +39,7 @@ const texturePaths = [
     `${basePath}assets/images/artwork2.jpg`,
     `${basePath}assets/images/artwork3.jpg`,
     `${basePath}assets/images/artwork4.jpg`,
+    `${basePath}assets/images/artwork-final-V1.jpg`,
 ];
 
 // Charger les textures et initialiser les sphères
@@ -52,17 +53,19 @@ Promise.all(texturePaths.map(loadTexture))
             [1, 2],    // La sphère 0 est connectée aux sphères 1 et 2
             [0, 3],    // La sphère 1 est connectée aux sphères 0 et 3
             [0, 3],    // La sphère 2 est connectée aux sphères 0 et 3
-            [1, 2],    // La sphère 3 est connectée aux sphères 1 et 2
+            [1, 2, 4], // La sphère 3 est connectée aux sphères 1, 2 et 4
+            [3],       // La sphère 4 est connectée uniquement à la sphère 3
         ];
         sphereManager.setAdjacencyMatrix(adjacencyMatrix);
 
         // Gestion des transitions avec les touches du clavier
         document.addEventListener('keydown', (event) => {
-            const nextIndices = sphereManager.getNextSphereIndices();
-            if (event.key === 'ArrowRight' && nextIndices.length > 0) {
-                sphereManager.navigateToSphere(nextIndices[0], 1000); // Naviguer vers la première sphère connectée
-            } else if (event.key === 'ArrowLeft' && nextIndices.length > 1) {
-                sphereManager.navigateToSphere(nextIndices[1], 1000); // Naviguer vers la seconde sphère connectée
+            if (event.key === 'ArrowRight') {
+                const nextIndex = (sphereManager.currentIndex + 1) % sphereManager.spheres.length; // Passer à la sphère suivante
+                sphereManager.navigateToSphere(nextIndex, 1000);
+            } else if (event.key === 'ArrowLeft') {
+                const prevIndex = (sphereManager.currentIndex - 1 + sphereManager.spheres.length) % sphereManager.spheres.length; // Revenir à la sphère précédente
+                sphereManager.navigateToSphere(prevIndex, 1000);
             }
         });
 
