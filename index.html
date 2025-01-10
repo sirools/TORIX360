@@ -1,5 +1,23 @@
-<!doctype html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><link rel="icon" href="./dist/favicon.ico" type="image/x-icon"><title>360-Degree VR Experience</title><style>body { margin: 0; }
-        canvas { display: block; }</style><link rel="icon" href="/TORIX360/favicon.ico"><script defer="defer" src="/TORIX360/main.js"></script></head><body><div id="controls"><button id="prevSphere">◀️ Précédent</button> <button id="nextSphere">▶️ Suivant</button></div><style>#controls {
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="./dist/favicon.ico" type="image/x-icon">
+    <title>360-Degree VR Experience</title>
+    <style>
+        body { margin: 0; }
+        canvas { display: block; }
+    </style>
+<link rel="icon" href="favicon.ico"><script defer src="main.js"></script></head>
+<body>
+    <!-- Le script sera injecté ici automatiquement -->
+    <div id="controls">
+    <button id="prevSphere">◀️ Précédent</button>
+    <button id="nextSphere">▶️ Suivant</button>
+    </div>
+    <style>
+        #controls {
             position: fixed;
             bottom: 20px;
             left: 50%;
@@ -15,4 +33,10 @@
             color: #fff;
             cursor: pointer;
             border-radius: 5px;
-        }</style></body></html>
+        }
+</style>
+<!-- test slider pour contraste -->
+<!-- <input type="range" id="contrastSlider" min="-1" max="1" step="0.1" value="0.2" />
+<label for="contrastSlider">Contrast</label> -->
+</body>
+</html>
