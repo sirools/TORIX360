@@ -1,3 +1,5 @@
+// Dans sphereManager.js
+
 import * as THREE from 'three';
 
 export class SphereManager {
@@ -23,27 +25,23 @@ export class SphereManager {
             material.renderOrder = index;
             const sphere = new THREE.Mesh(this.sphereGeometry, material);
             this.scene.add(sphere);
+
+            console.log(`Sphère ${index} créée avec texture :`, texture);
             return sphere;
         });
     }
 
-    updateSphereOpacity(index, opacity) {
-        if (this.spheres[index]) {
-            this.spheres[index].material.opacity = opacity;
+    navigateToSphere(nextIndex, duration) {
+        if (this.spheres[nextIndex]) {
+            console.log(`Navigation vers la sphère ${nextIndex}`);
+            this.crossfadeTransition(duration, nextIndex);
         } else {
-            console.warn(`Sphère à l'indice ${index} introuvable.`);
+            console.warn(`Aucune sphère à l'indice ${nextIndex}`);
         }
     }
 
-    // Fonction easing pour des transitions fluides
-    static easeInOut(t) {
-        return t < 0.5 ? 2 * t * t : -1 + (4 - 2 * t) * t;
-    }
-
-    crossfadeTransition(duration) {
+    crossfadeTransition(duration, nextIndex) {
         const startTime = Date.now();
-        const nextIndex = (this.currentIndex + 1) % this.spheres.length;
-
         const animateFade = () => {
             const elapsed = Date.now() - startTime;
             const progress = Math.min(elapsed / duration, 1);
@@ -63,19 +61,15 @@ export class SphereManager {
         animateFade();
     }
 
-    setAdjacencyMatrix(matrix) {
-        this.adjacencyMatrix = matrix;
-    }
-
-    getNextSphereIndices() {
-        return this.adjacencyMatrix[this.currentIndex] || [];
-    }
-
-    navigateToSphere(nextIndex, duration) {
-        if (this.spheres[nextIndex]) {
-            this.crossfadeTransition(duration);
+    updateSphereOpacity(index, opacity) {
+        if (this.spheres[index]) {
+            this.spheres[index].material.opacity = opacity;
         } else {
-            console.warn(`Aucune sphère à l'indice ${nextIndex}`);
+            console.warn(`Sphère à l'indice ${index} introuvable.`);
         }
+    }
+
+    static easeInOut(t) {
+        return t < 0.5 ? 2 * t * t : -1 + (4 - 2 * t) * t;
     }
 }
