@@ -26,6 +26,13 @@ module.exports = (env, argv) => {
                     exclude: /node_modules/,
                     use: 'babel-loader',
                 },
+                {
+                    test: /\.(png|jpe?g|gif)$/i, // Ajout de la règle pour les images
+                    type: 'asset/resource',  // Garder l'extension du fichier (pas de renaming)
+                    generator: {
+                        filename: 'assets/images/[name][ext]', // Conserve le nom et l'extension des fichiers
+                    },
+                },
             ],
         },
         plugins: [

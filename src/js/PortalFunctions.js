@@ -13,6 +13,7 @@ import { getRandomPositionOnSphere, changePortalColor, animatePortalScale } from
 export function addStylizedPortals(scene, interactiveAssets, handlePortalClick) {
     const whiteTexture = new THREE.TextureLoader().load('./assets/images/white-texture.png');
     const redTexture = new THREE.TextureLoader().load('./assets/images/red-texture.png');
+    
 
     for (let i = 0; i < 3; i++) {
         const radius = 20;
