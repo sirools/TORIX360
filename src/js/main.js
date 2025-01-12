@@ -66,6 +66,15 @@ window.addEventListener('mousemove', (event) => {
 
 window.addEventListener('click', handleMouseClick);
 
+// Ajouter un gestionnaire pour le tap sur mobile
+window.addEventListener('touchstart', handleTouchStart);
+
+function handleTouchStart(event) {
+    // Prévenir la propagation de l'événement pour éviter toute interaction non souhaitée
+    event.preventDefault(); 
+    handleMouseClick(event); // Utiliser la même fonction pour gérer le clic ou le tap
+}
+
 // Postprocessing
 const composer = new EffectComposer(renderer);
 composer.addPass(new RenderPass(scene, camera));
