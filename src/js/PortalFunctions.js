@@ -26,13 +26,18 @@ function repositionPortals(interactiveAssets) {
 export function addStylizedPortals(scene, interactiveAssets, handlePortalClick) {
     const whiteTexture = new THREE.TextureLoader().load('./assets/images/white-texture.png');
     const redTexture = new THREE.TextureLoader().load('./assets/images/red-texture.png');
+    
+    //Variables des assets pour les portails de 1 à 6
     const blueTexture = new THREE.TextureLoader().load('./assets/images/blue-texture.png'); // Texture pour portail 1
     const greenTexture = new THREE.TextureLoader().load('./assets/images/green-texture.png'); // Texture pour portail 2
     const yellowTexture = new THREE.TextureLoader().load('./assets/images/yellow-texture.png'); // Texture pour portail 3
+    const purpleTexture = new THREE.TextureLoader().load('./assets/images/purple-texture.png'); // Texture pour portail 4
+    const orangeTexture = new THREE.TextureLoader().load('./assets/images/orange-texture.png'); // Texture pour portail 5
+    const pinkTexture = new THREE.TextureLoader().load('./assets/images/pink-texture.png'); // Texture pour portail 6
 
-    const textures = [blueTexture, greenTexture, yellowTexture]; // Tableau des textures
+    const textures = [blueTexture, greenTexture, yellowTexture, purpleTexture, orangeTexture, pinkTexture]; // Tableau des textures
 
-    for (let i = 0; i < 3; i++) {
+    for (let i = 0; i < textures.length; i++) {
         const radius = 20;
         const portalGeometry = new THREE.SphereGeometry(radius, 32, 32);
 

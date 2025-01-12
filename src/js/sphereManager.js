@@ -15,14 +15,26 @@ export class SphereManager {
     }
 
     createSpheres() {
-        this.spheres = this.textures.map((texture, index) => {
+        // Charger les textures avant de les utiliser
+        const texture1 = new THREE.TextureLoader().load('./assets/images/artwork1.jpg');
+        const texture2 = new THREE.TextureLoader().load('./assets/images/artwork2.jpg');
+        const texture3 = new THREE.TextureLoader().load('./assets/images/artwork3.jpg');
+        const texture4 = new THREE.TextureLoader().load('./assets/images/artwork4.jpg');
+        const texture5 = new THREE.TextureLoader().load('./assets/images/artwork5.jpg');
+        const texture6 = new THREE.TextureLoader().load('./assets/images/artwork-final-V1.jpg');
+
+        // Tableau des textures
+        const newTextures = [texture1, texture2, texture3, texture4, texture5, texture6];
+
+        this.spheres = newTextures.map((texture, index) => {
             const material = new THREE.MeshBasicMaterial({
                 map: texture,
                 transparent: true,
                 opacity: index === 0 ? 1 : 0, // La première texture est visible
             });
 
-            material.renderOrder = index;
+            material.renderOrder = index; // On garde l'ordre de rendu basé sur l'index
+
             const sphere = new THREE.Mesh(this.sphereGeometry, material);
             this.scene.add(sphere);
 
