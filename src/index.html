@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" href="./dist/favicon.ico" type="image/x-icon">
+    <link rel="stylesheet" href="styles/main.css">
     <title>360-Degree VR Experience</title>
     <style>
         body { margin: 0; }
@@ -12,6 +13,15 @@
 </head>
 <body>
     <!-- Le script sera injecté ici automatiquement -->
+    <!-- Interstitiel -->
+    <div id="interstitial" style="display: none;">
+        <div id="interstitial-content">
+            <h2 id="interstitial-title"></h2>
+            <p id="interstitial-subtitle"></p>
+            <p id="interstitial-click">Cliquez pour continuer</p>
+            <button id="interstitial-close">Fermer</button>
+        </div>
+    </div>
     <!-- <div id="controls">
     <button id="prevSphere">◀️ Précédent</button>
     <button id="nextSphere">▶️ Suivant</button>

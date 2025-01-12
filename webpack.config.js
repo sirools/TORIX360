@@ -1,6 +1,7 @@
 const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
+const MiniCssExtractPlugin = require('mini-css-extract-plugin'); // Ajout du plugin pour extraire le CSS
 
 module.exports = (env, argv) => {
     const isProd = argv.mode === 'production'; // Vérifie si le mode est production
@@ -33,6 +34,10 @@ module.exports = (env, argv) => {
                         filename: 'assets/images/[name][ext]', // Conserve le nom et l'extension des fichiers
                     },
                 },
+                {
+                    test: /\.css$/, // Règle pour charger le CSS
+                    use: [MiniCssExtractPlugin.loader, 'css-loader'], // Utilisation de MiniCssExtractPlugin
+                },
             ],
         },
         plugins: [
@@ -45,6 +50,9 @@ module.exports = (env, argv) => {
                     { from: './src/assets', to: 'assets' }, // Copie les assets vers dist
                 ],
             }),
+            new MiniCssExtractPlugin({
+                filename: 'styles/main.css', // Le fichier CSS extrait
+            }), // Plugin pour extraire le CSS
         ],
         devServer: {
             static: {

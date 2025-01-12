@@ -4,6 +4,10 @@ import { loadTexture } from '@js/assetLoader.js';
 import { SphereManager } from '@js/sphereManager.js';
 import { InteractionManager } from '@js/interactionManager.js';
 import { addStylizedPortals } from './PortalFunctions.js';
+import { showInterstitial, hideInterstitial } from './interstitialComponent.js';
+
+import '../styles/main.css';  // Importer le fichier CSS
+
 import { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer.js';
 import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass.js';
 import { ShaderPass } from 'three/examples/jsm/postprocessing/ShaderPass.js';
@@ -132,14 +136,37 @@ function initializeSpheres(loadedTextures) {
     return sphereManager;
 }
 
+
+
+
+let currentWorldIndex = 0;  // Indice du monde actuel, à ajuster lors des transitions
+
 function handlePortalClick(index) {
     console.log(`Portail ${index} cliqué. Téléportation...`);
-    if (sphereManager) {
-        sphereManager.navigateToSphere((index + 1) % sphereManager.spheres.length, 1000); 
-    } else {
-        console.error('sphereManager n\'est pas défini. Impossible de naviguer vers la sphère.');
-    }
+    
+    // Masquer l'interstitiel précédent (si nécessaire)
+    hideInterstitial();
+    
+    // Transition vers la nouvelle sphère
+    sphereManager.navigateToSphere(index, 1000); // Navigation avec un délai de 1000 ms
+    
+    // Afficher l'interstitiel correspondant à la nouvelle sphère
+    currentWorldIndex = index;
+    showInterstitial(currentWorldIndex);
 }
+
+// Lors de l'initialisation, tu peux afficher l'interstitiel du premier monde
+showInterstitial(currentWorldIndex);
+
+
+
+
+document.getElementById("interstitial-close").addEventListener("click", () => {
+    hideInterstitial();  // Masquer l'interstitiel quand le bouton est cliqué
+});
+
+
+
 
 function animate(interactionManager) {
     requestAnimationFrame(() => animate(interactionManager));
