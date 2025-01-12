@@ -75,6 +75,20 @@ function handleTouchStart(event) {
     handleMouseClick(event); // Utiliser la même fonction pour gérer le clic ou le tap
 }
 
+// Fonction pour adapter la taille du canvas lors du redimensionnement de la fenêtre
+window.addEventListener('resize', () => {
+    const width = window.innerWidth;
+    const height = window.innerHeight;
+
+    // Mettre à jour la taille du renderer
+    renderer.setSize(width, height);
+
+    // Mettre à jour le ratio de la caméra pour le redimensionnement
+    camera.aspect = width / height;
+    camera.updateProjectionMatrix();
+});
+
+
 // Postprocessing
 const composer = new EffectComposer(renderer);
 composer.addPass(new RenderPass(scene, camera));

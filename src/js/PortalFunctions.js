@@ -10,22 +10,39 @@ import { getRandomPositionOnSphere, changePortalColor, animatePortalScale } from
 
 
 
+
+// Fonction pour relancer la position aléatoire des portails après chaque clic
+function repositionPortals(interactiveAssets) {
+    // Pour chaque portail, on lui attribue une nouvelle position aléatoire
+    interactiveAssets.forEach(asset => {
+        const newPosition = getRandomPositionOnSphere(500);
+        asset.object.position.set(newPosition.x, newPosition.y, newPosition.z);
+        console.log(`Portail déplacé vers la nouvelle position : ${newPosition}`);
+    });
+}
+
+
+
 export function addStylizedPortals(scene, interactiveAssets, handlePortalClick) {
     const whiteTexture = new THREE.TextureLoader().load('./assets/images/white-texture.png');
     const redTexture = new THREE.TextureLoader().load('./assets/images/red-texture.png');
-    
+    const blueTexture = new THREE.TextureLoader().load('./assets/images/blue-texture.png'); // Texture pour portail 1
+    const greenTexture = new THREE.TextureLoader().load('./assets/images/green-texture.png'); // Texture pour portail 2
+    const yellowTexture = new THREE.TextureLoader().load('./assets/images/yellow-texture.png'); // Texture pour portail 3
+
+    const textures = [blueTexture, greenTexture, yellowTexture]; // Tableau des textures
 
     for (let i = 0; i < 3; i++) {
         const radius = 20;
         const portalGeometry = new THREE.SphereGeometry(radius, 32, 32);
+
         const portalMaterial = new THREE.MeshBasicMaterial({
-            map: whiteTexture, // Définir la texture initiale
+            map: textures[i], // Applique une texture différente pour chaque portail
             transparent: true,
-            opacity: 1 // Définir l'opacité initiale
+            opacity: 1,
         });
 
         const portal = new THREE.Mesh(portalGeometry, portalMaterial);
-
         const position = getRandomPositionOnSphere(500);
         portal.position.set(position.x, position.y, position.z);
         scene.add(portal);
@@ -36,41 +53,19 @@ export function addStylizedPortals(scene, interactiveAssets, handlePortalClick) 
 
         portal.onHover = (isHovered) => {
             if (isHovered) {
-                // Changer le curseur en main lors du hover
                 document.body.style.cursor = 'pointer';
-
-                // Commencer l'animation pour changer la texture de blanc à rouge
-                new TWEEN.Tween(portal.material)
-                    .to({ opacity: 0 }, 300) // Réduire l'opacité à 0 (fondu)
-                    .onComplete(() => {
-                        portal.material.map = redTexture; // Changer la texture en rouge
-                        portal.material.needsUpdate = true; // Signaler que la texture a changé
-                        new TWEEN.Tween(portal.material)
-                            .to({ opacity: 1 }, 300) // Remettre l'opacité à 1 (fondu)
-                            .start();
-                    })
-                    .start();
+                portal.material.color.set(0xff0000);
             } else {
-                // Revenir au curseur par défaut
                 document.body.style.cursor = 'auto';
-
-                // Commencer l'animation pour revenir à la texture blanche
-                new TWEEN.Tween(portal.material)
-                    .to({ opacity: 0 }, 300) // Réduire l'opacité à 0 (fondu)
-                    .onComplete(() => {
-                        portal.material.map = whiteTexture; // Revenir à la texture blanche
-                        portal.material.needsUpdate = true; // Signaler que la texture a changé
-                        new TWEEN.Tween(portal.material)
-                            .to({ opacity: 1 }, 300) // Remettre l'opacité à 1 (fondu)
-                            .start();
-                    })
-                    .start();
+                portal.material.color.set(0xffffff);
             }
         };
 
         portal.onClick = () => {
             console.log(`Portail ${i} cliqué. Téléportation...`);
             handlePortalClick(i);
+            // Relance la position aléatoire des portails après chaque clic
+            repositionPortals(interactiveAssets);  // Passer interactiveAssets ici
         };
 
         interactiveAssets.push({
@@ -79,6 +74,6 @@ export function addStylizedPortals(scene, interactiveAssets, handlePortalClick) 
             onClick: portal.onClick,
         });
 
-        console.log(`Portail ${i} ajouté avec lumière et comportement unique.`);
+        console.log(`Portail ${i} ajouté avec texture et comportement unique.`);
     }
 }
