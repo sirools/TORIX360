@@ -1,6 +1,9 @@
 // Dans sphereManager.js
 
 import * as THREE from 'three';
+import { addStylizedPortals } from './PortalFunctions';  // Assurez-vous que l'importation est correcte
+
+
 
 export class SphereManager {
     constructor(scene, textures, renderer) {
@@ -46,6 +49,12 @@ export class SphereManager {
     navigateToSphere(nextIndex, duration) {
         if (this.spheres[nextIndex]) {
             console.log(`Navigation vers la sphère ${nextIndex}`);
+            
+            // Ajout des portails avec l'index actuel de la sphère
+            const currentIndex = nextIndex;  // L'index de la sphère actuelle
+            addStylizedPortals(this.scene, this.interactiveAssets, this.handlePortalClick, currentIndex);
+
+            // Lancer la transition vers la nouvelle sphère
             this.crossfadeTransition(duration, nextIndex);
         } else {
             console.warn(`Aucune sphère à l'indice ${nextIndex}`);

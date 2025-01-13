@@ -57,10 +57,13 @@ module.exports = (env, argv) => {
         devServer: {
             static: {
                 directory: path.resolve(__dirname, 'dist'),
+                publicPath: '/', // Assurez-vous que le chemin d'accès aux fichiers statiques est bien défini
             },
+            hot: true,         // Active le HMR (Hot Module Replacement)
             compress: true,
             port: 8080, // Définit le port du serveur local
             open: true, // Ouvre automatiquement le navigateur
+            historyApiFallback: true, // Permet les redirections sans casser les routes
         },
         mode: argv.mode || 'development', // Définit le mode par défaut à développement
     };

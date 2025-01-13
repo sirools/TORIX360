@@ -1,15 +1,27 @@
-
+// PortalFunctions.js
 
 import * as THREE from 'three';
-
-import TWEEN from '@tweenjs/tween.js'; // Assurez-vous que cette ligne est correcte
-
 import { getRandomPositionOnSphere, changePortalColor, animatePortalScale } from './helpers.js';
+import { portalMatrix, getRandomPortal } from './portalManager';  // Importation correcte de la matrice et des fonctions
+import { getAvailablePortals } from './portalManager';  // Assurez-vous que le chemin d'importation est correct
 
-//import { getRandomPositionOnSphere } from './helpers.js';
+// Fonction pour supprimer les anciens portails
+export function removePortals(scene) {
+    if (!(scene instanceof THREE.Scene)) {
+        console.error("L'objet passé n'est pas une instance de THREE.Scene !");
+        return;  // Sortir de la fonction si ce n'est pas une scène valide
+    }
 
+    console.log("La scène est prête, suppression des portails...");
 
-
+    // On traverse tous les enfants de la scène pour trouver les portails
+    scene.traverse((child) => {
+        if (child.isMesh && child.name.startsWith('portal')) {
+            scene.remove(child);
+            console.log(`Portail supprimé: ${child.name}`);
+        }
+    });
+}
 
 // Fonction pour relancer la position aléatoire des portails après chaque clic
 function repositionPortals(interactiveAssets) {
@@ -21,41 +33,63 @@ function repositionPortals(interactiveAssets) {
     });
 }
 
+// Fonction pour ajouter des portails stylisés dans la scène
+export function addStylizedPortals(scene, interactiveAssets, handlePortalClick, currentIndex) {
+    if (!interactiveAssets) {
+        console.error("interactiveAssets n'est pas défini.");
+        return;
+    }
 
+    // Supprimer les anciens portails avant d'ajouter de nouveaux
+    removePortals(scene);
 
-export function addStylizedPortals(scene, interactiveAssets, handlePortalClick) {
-    const whiteTexture = new THREE.TextureLoader().load('./assets/images/white-texture.png');
-    const redTexture = new THREE.TextureLoader().load('./assets/images/red-texture.png');
-    
-    //Variables des assets pour les portails de 1 à 6
-    const blueTexture = new THREE.TextureLoader().load('./assets/images/blue-texture.png'); // Texture pour portail 1
-    const greenTexture = new THREE.TextureLoader().load('./assets/images/green-texture.png'); // Texture pour portail 2
-    const yellowTexture = new THREE.TextureLoader().load('./assets/images/yellow-texture.png'); // Texture pour portail 3
-    const purpleTexture = new THREE.TextureLoader().load('./assets/images/purple-texture.png'); // Texture pour portail 4
-    const orangeTexture = new THREE.TextureLoader().load('./assets/images/orange-texture.png'); // Texture pour portail 5
-    const pinkTexture = new THREE.TextureLoader().load('./assets/images/pink-texture.png'); // Texture pour portail 6
+    // Récupère les portails disponibles pour le monde actuel
+    const availablePortals = getAvailablePortals(currentIndex);
+    console.log("Portails disponibles pour le monde ", currentIndex, availablePortals);
 
-    const textures = [blueTexture, greenTexture, yellowTexture, purpleTexture, orangeTexture, pinkTexture]; // Tableau des textures
+    const selectedPortals = [];
 
-    for (let i = 0; i < textures.length; i++) {
+    // Sélectionne 3 portails aléatoires sans doublon
+    while (selectedPortals.length < 3) {
+        const randomPortal = availablePortals[Math.floor(Math.random() * availablePortals.length)];
+        if (!selectedPortals.includes(randomPortal)) {
+            selectedPortals.push(randomPortal);
+        }
+    }
+
+    // Définition des textures pour les portails
+    const textures = [
+        new THREE.TextureLoader().load('./assets/images/blue-texture.png'),
+        new THREE.TextureLoader().load('./assets/images/green-texture.png'),
+        new THREE.TextureLoader().load('./assets/images/yellow-texture.png'),
+        new THREE.TextureLoader().load('./assets/images/pink-texture.png'),
+        new THREE.TextureLoader().load('./assets/images/orange-texture.png'),
+        new THREE.TextureLoader().load('./assets/images/purple-texture.png'),
+    ];
+
+    // Création des portails sélectionnés
+    selectedPortals.forEach((portalIndex, i) => {
         const radius = 20;
         const portalGeometry = new THREE.SphereGeometry(radius, 32, 32);
 
         const portalMaterial = new THREE.MeshBasicMaterial({
-            map: textures[i], // Applique une texture différente pour chaque portail
+            map: textures[portalIndex], // Applique la texture du portail sélectionné
             transparent: true,
             opacity: 1,
         });
 
         const portal = new THREE.Mesh(portalGeometry, portalMaterial);
-        const position = getRandomPositionOnSphere(500);
+        const position = getRandomPositionOnSphere(500);  // Utilise une fonction pour positionner le portail
         portal.position.set(position.x, position.y, position.z);
+        portal.name = `portal_${i}`; // Pour pouvoir le retrouver plus tard et le supprimer
         scene.add(portal);
 
+        // Ajout de la lumière pour chaque portail
         const portalLight = new THREE.PointLight(0x00ff00, 1, 100);
         portalLight.position.set(position.x, position.y, position.z);
         scene.add(portalLight);
 
+        // Comportement de survol du portail
         portal.onHover = (isHovered) => {
             if (isHovered) {
                 document.body.style.cursor = 'pointer';
@@ -66,11 +100,11 @@ export function addStylizedPortals(scene, interactiveAssets, handlePortalClick) 
             }
         };
 
+        // Comportement de clic sur le portail
         portal.onClick = () => {
-            console.log(`Portail ${i} cliqué. Téléportation...`);
-            handlePortalClick(i);
-            // Relance la position aléatoire des portails après chaque clic
-            repositionPortals(interactiveAssets);  // Passer interactiveAssets ici
+            console.log(`Portail ${portalIndex} cliqué. Téléportation...`);
+            handlePortalClick(portalIndex);  // Cette fonction gère la logique de transition
+            repositionPortals(interactiveAssets);
         };
 
         interactiveAssets.push({
@@ -79,6 +113,6 @@ export function addStylizedPortals(scene, interactiveAssets, handlePortalClick) 
             onClick: portal.onClick,
         });
 
-        console.log(`Portail ${i} ajouté avec texture et comportement unique.`);
-    }
+        console.log(`Portail ${portalIndex} ajouté à la scène avec texture`, textures[i]);
+    });
 }

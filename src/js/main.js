@@ -1,12 +1,14 @@
+// main.js
+
 import * as THREE from 'three';
 import TWEEN from '@tweenjs/tween.js';
 import { loadTexture } from '@js/assetLoader.js';
 import { SphereManager } from '@js/sphereManager.js';
 import { InteractionManager } from '@js/interactionManager.js';
-import { addStylizedPortals } from './PortalFunctions.js';
+import { addStylizedPortals, removePortals } from './PortalFunctions.js';
 import { showInterstitial, hideInterstitial } from './interstitialComponent.js';
 
-import '../styles/main.css';  // Importer le fichier CSS
+import '../styles/main.css';
 
 import { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer.js';
 import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass.js';
@@ -16,20 +18,14 @@ import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 
 console.log('Code exécuté');
 
-// Constantes de l'environnement
-const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
-const isProd = !isLocal;
-const basePath = isProd ? '/TORIX360/dist/assets/images/' : './assets/images/';
-
-let interactiveAssets = []; // Tableau des assets interactifs
-
+let interactiveAssets = [];
 const texturePaths = [
-    `${basePath}artwork1.jpg`,
-    `${basePath}artwork2.jpg`,
-    `${basePath}artwork3.jpg`,
-    `${basePath}artwork4.jpg`,
-    `${basePath}artwork5.jpg`,
-    `${basePath}artwork-final-V1.jpg`,
+    './assets/images/artwork1.jpg',
+    './assets/images/artwork2.jpg',
+    './assets/images/artwork3.jpg',
+    './assets/images/artwork4.jpg',
+    './assets/images/artwork5.jpg',
+    './assets/images/artwork-final-V1.jpg',
 ];
 
 console.log("Texte des textures:", texturePaths);
@@ -38,7 +34,6 @@ console.log("Texte des textures:", texturePaths);
 const scene = new THREE.Scene();
 const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
 camera.position.z = 480;
-
 const renderer = new THREE.WebGLRenderer({ antialias: true });
 renderer.setSize(window.innerWidth, window.innerHeight);
 renderer.setClearColor(0x000000, 1);
@@ -69,29 +64,20 @@ window.addEventListener('mousemove', (event) => {
 });
 
 window.addEventListener('click', handleMouseClick);
-
-// Ajouter un gestionnaire pour le tap sur mobile
 window.addEventListener('touchstart', handleTouchStart);
 
 function handleTouchStart(event) {
-    // Prévenir la propagation de l'événement pour éviter toute interaction non souhaitée
     event.preventDefault(); 
-    handleMouseClick(event); // Utiliser la même fonction pour gérer le clic ou le tap
+    handleMouseClick(event);
 }
 
-// Fonction pour adapter la taille du canvas lors du redimensionnement de la fenêtre
 window.addEventListener('resize', () => {
     const width = window.innerWidth;
     const height = window.innerHeight;
-
-    // Mettre à jour la taille du renderer
     renderer.setSize(width, height);
-
-    // Mettre à jour le ratio de la caméra pour le redimensionnement
     camera.aspect = width / height;
     camera.updateProjectionMatrix();
 });
-
 
 // Postprocessing
 const composer = new EffectComposer(renderer);
@@ -103,6 +89,7 @@ composer.addPass(brightnessContrastPass);
 
 // Raycaster & mouse interaction
 let sphereManager;
+let currentWorldIndex = 0;  
 
 function initialize() {
     loadTextures(texturePaths)
@@ -131,42 +118,31 @@ function loadTextures(paths) {
 
 function initializeSpheres(loadedTextures) {
     const sphereManager = new SphereManager(scene, loadedTextures, renderer);
-    sphereManager.createSpheres(); 
-    addStylizedPortals(scene, interactiveAssets, handlePortalClick); 
+    sphereManager.createSpheres();
+
+    // Avant d'ajouter les nouveaux portails, on supprime les anciens portails
+    console.log("Scene avant suppression des portails:", scene);
+    removePortals(scene);
+
+    // Ajout des nouveaux portails
+    addStylizedPortals(scene, interactiveAssets, handlePortalClick, currentWorldIndex); 
     return sphereManager;
 }
-
-
-
-
-let currentWorldIndex = 0;  // Indice du monde actuel, à ajuster lors des transitions
 
 function handlePortalClick(index) {
     console.log(`Portail ${index} cliqué. Téléportation...`);
     
-    // Masquer l'interstitiel précédent (si nécessaire)
-    hideInterstitial();
-    
-    // Transition vers la nouvelle sphère
-    sphereManager.navigateToSphere(index, 1000); // Navigation avec un délai de 1000 ms
-    
-    // Afficher l'interstitiel correspondant à la nouvelle sphère
-    currentWorldIndex = index;
-    showInterstitial(currentWorldIndex);
+    hideInterstitial();  // Masquer l'interstitiel
+
+    sphereManager.navigateToSphere(index, 1000);  // Navigation vers la sphère
+
+    currentWorldIndex = index;  // Mise à jour de l'index
+    showInterstitial(currentWorldIndex);  // Affichage de l'interstitiel suivant
 }
 
-// Lors de l'initialisation, tu peux afficher l'interstitiel du premier monde
-showInterstitial(currentWorldIndex);
-
-
-
-
 document.getElementById("interstitial-close").addEventListener("click", () => {
-    hideInterstitial();  // Masquer l'interstitiel quand le bouton est cliqué
+    hideInterstitial();  
 });
-
-
-
 
 function animate(interactionManager) {
     requestAnimationFrame(() => animate(interactionManager));
