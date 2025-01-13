@@ -1,70 +1,73 @@
-const path = require('path');
+const path = require('path');  // Import du module path
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
-const MiniCssExtractPlugin = require('mini-css-extract-plugin'); // Ajout du plugin pour extraire le CSS
+const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 
 module.exports = (env, argv) => {
-    const isProd = argv.mode === 'production'; // Vérifie si le mode est production
+  const isProd = argv.mode === 'production';
 
-    return {
-        entry: './src/js/main.js',
-        output: {
-            filename: 'main.js',
-            path: path.resolve(__dirname, 'dist'),
-            publicPath: isProd ? '/TORIX360/dist/' : '/', // Chemin public pour prod ou dev
-            clean: true,
+  return {
+    entry: './src/js/main.js',
+    output: {
+      filename: 'main.js',
+      path: path.resolve(__dirname, 'dist'),
+      publicPath: isProd ? '/TORIX360/dist/' : '/',
+      clean: true,
+    },
+    resolve: {
+      extensions: ['.js'],
+      alias: {
+        '@js': path.resolve(__dirname, 'src/js'),
+      },
+    },
+    module: {
+      rules: [
+        {
+          test: /\.js$/,
+          exclude: /node_modules/,
+          use: 'babel-loader',
         },
-        resolve: {
-            extensions: ['.js'],
-            alias: {
-                '@js': path.resolve(__dirname, 'src/js'), // Alias pour le répertoire JS
-            },
+        {
+          test: /\.(png|jpe?g|gif)$/i,
+          type: 'asset/resource',
+          generator: {
+            filename: 'assets/images/[name][ext]',
+          },
         },
-        module: {
-            rules: [
-                {
-                    test: /\.js$/,
-                    exclude: /node_modules/,
-                    use: 'babel-loader',
-                },
-                {
-                    test: /\.(png|jpe?g|gif)$/i, // Ajout de la règle pour les images
-                    type: 'asset/resource',  // Garder l'extension du fichier (pas de renaming)
-                    generator: {
-                        filename: 'assets/images/[name][ext]', // Conserve le nom et l'extension des fichiers
-                    },
-                },
-                {
-                    test: /\.css$/, // Règle pour charger le CSS
-                    use: [MiniCssExtractPlugin.loader, 'css-loader'], // Utilisation de MiniCssExtractPlugin
-                },
-            ],
+        {
+          test: /\.css$/,
+          use: [
+            MiniCssExtractPlugin.loader, 
+            'css-loader',
+          ],
         },
-        plugins: [
-            new HtmlWebpackPlugin({
-                template: './src/index.html',
-                favicon: './src/favicon.ico', // Inclut le favicon dans le HTML généré
-            }),
-            new CopyWebpackPlugin({
-                patterns: [
-                    { from: './src/assets', to: 'assets' }, // Copie les assets vers dist
-                ],
-            }),
-            new MiniCssExtractPlugin({
-                filename: 'styles/main.css', // Le fichier CSS extrait
-            }), // Plugin pour extraire le CSS
+      ],
+    },
+    plugins: [
+      new HtmlWebpackPlugin({
+        template: './src/index.html',
+        favicon: './src/favicon.ico',
+      }),
+      new CopyWebpackPlugin({
+        patterns: [
+          { from: './src/assets', to: 'assets' },
         ],
-        devServer: {
-            static: {
-                directory: path.resolve(__dirname, 'dist'),
-                publicPath: '/', // Assurez-vous que le chemin d'accès aux fichiers statiques est bien défini
-            },
-            hot: true,         // Active le HMR (Hot Module Replacement)
-            compress: true,
-            port: 8080, // Définit le port du serveur local
-            open: true, // Ouvre automatiquement le navigateur
-            historyApiFallback: true, // Permet les redirections sans casser les routes
-        },
-        mode: argv.mode || 'development', // Définit le mode par défaut à développement
-    };
+      }),
+      new MiniCssExtractPlugin({
+        filename: 'styles/main.css', 
+      }),
+    ],
+    devServer: {
+      static: {
+        directory: path.resolve(__dirname, 'dist'),
+        publicPath: '/',
+      },
+      hot: true,
+      compress: true,
+      port: 8080,
+      open: true,
+      historyApiFallback: true,
+    },
+    mode: argv.mode || 'development',
+  };
 };

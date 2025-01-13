@@ -1,11 +1,6 @@
-// Dans sphereManager.js
-
 import * as THREE from 'three';
-import { addStylizedPortals } from './PortalFunctions';  // Assurez-vous que l'importation est correcte
 
-
-
-export class SphereManager {
+class SphereManager {
     constructor(scene, textures, renderer) {
         this.scene = scene;
         this.textures = textures;
@@ -28,19 +23,16 @@ export class SphereManager {
 
         // Tableau des textures
         const newTextures = [texture1, texture2, texture3, texture4, texture5, texture6];
-
         this.spheres = newTextures.map((texture, index) => {
             const material = new THREE.MeshBasicMaterial({
                 map: texture,
                 transparent: true,
-                opacity: index === 0 ? 1 : 0, // La première texture est visible
+                opacity: index === 0 ? 1 : 0 // La première texture est visible
             });
-
             material.renderOrder = index; // On garde l'ordre de rendu basé sur l'index
 
             const sphere = new THREE.Mesh(this.sphereGeometry, material);
             this.scene.add(sphere);
-
             console.log(`Sphère ${index} créée avec texture :`, texture);
             return sphere;
         });
@@ -49,12 +41,6 @@ export class SphereManager {
     navigateToSphere(nextIndex, duration) {
         if (this.spheres[nextIndex]) {
             console.log(`Navigation vers la sphère ${nextIndex}`);
-            
-            // Ajout des portails avec l'index actuel de la sphère
-            const currentIndex = nextIndex;  // L'index de la sphère actuelle
-            addStylizedPortals(this.scene, this.interactiveAssets, this.handlePortalClick, currentIndex);
-
-            // Lancer la transition vers la nouvelle sphère
             this.crossfadeTransition(duration, nextIndex);
         } else {
             console.warn(`Aucune sphère à l'indice ${nextIndex}`);
@@ -67,7 +53,6 @@ export class SphereManager {
             const elapsed = Date.now() - startTime;
             const progress = Math.min(elapsed / duration, 1);
             const easedProgress = SphereManager.easeInOut(progress);
-
             this.updateSphereOpacity(this.currentIndex, 1 - easedProgress);
             this.updateSphereOpacity(nextIndex, easedProgress);
 
@@ -94,3 +79,6 @@ export class SphereManager {
         return t < 0.5 ? 2 * t * t : -1 + (4 - 2 * t) * t;
     }
 }
+
+// Exporte la classe SphereManager pour l'utiliser dans d'autres fichiers
+export { SphereManager };
