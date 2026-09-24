@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>TORIX360 · Gardiens des Portails</title>
+    <style>
+      html, body { margin: 0; height: 100%; overflow: hidden; background: #1a1438; font-family: system-ui, -apple-system, sans-serif; }
+      canvas { display: block; }
+      #intro {
+        position: fixed; top: 16px; left: 16px; max-width: min(360px, calc(100vw - 64px));
+        padding: 16px 18px; border-radius: 16px; color: #fff;
+        background: rgba(24, 18, 56, 0.78); backdrop-filter: blur(12px);
+        border: 1px solid rgba(126, 246, 255, 0.35);
+      }
+      #intro h1 { margin: 0 0 4px; font-size: 20px; letter-spacing: 0.02em; }
+      #intro h1 span { color: #7ff6ff; }
+      #intro p { margin: 6px 0; font-size: 14px; line-height: 1.4; color: #e6e0ff; }
+      #intro kbd { background: rgba(255,255,255,0.15); border-radius: 4px; padding: 0 4px; }
+      #xr-slot { position: fixed; bottom: 20px; left: 0; right: 0; height: 60px; }
+      body.in-xr #intro { display: none; }
+    </style>
+  </head>
+  <body>
+    <div id="intro">
+      <h1><span>TORIX360</span> · Gardiens des Portails</h1>
+      <p>Scelle les 3 portails avant que les Glitchs ne te submergent.</p>
+      <p><b>Vision Pro :</b> regarde une case et pince les doigts. <b>Écran :</b> clic pour jouer, glisser pour tourner autour du plateau.</p>
+      <p>6 <kbd>PA</kbd> pour les sorts, 3 <kbd>PM</kbd> pour bouger, à chaque tour.</p>
+    </div>
+    <div id="xr-slot"></div>
+    <script type="module" src="./src/main.js"></script>
+  </body>
+</html>
