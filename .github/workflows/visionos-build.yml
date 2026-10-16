@@ -15,8 +15,20 @@ jobs:
   build:
     runs-on: macos-15
     timeout-minutes: 40
+    strategy:
+      fail-fast: false
+      matrix:
+        # "default" = Xcode par défaut du runner ; "latest" = Xcode le plus récent installé.
+        xcode: [default, latest]
     steps:
       - uses: actions/checkout@v4
+
+      - name: Choisir Xcode
+        if: matrix.xcode == 'latest'
+        run: |
+          LATEST=$(ls -d /Applications/Xcode_*.app | grep -v -i beta | sort -V | tail -1)
+          echo "Xcode sélectionné : $LATEST"
+          sudo xcode-select -s "$LATEST"
 
       - name: Xcode et SDK disponibles
         run: |

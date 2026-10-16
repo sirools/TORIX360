@@ -48,20 +48,22 @@ final class ElementEffects {
     /// Joue un petit carillon depuis la position de l'élément (audio spatial RealityKit).
     /// Placeholder généré par `ToneGenerator` ; à remplacer par de vrais sons via `ResourceProvider`.
     private func playSound(on entity: Entity, kind: ElementKind, notes: [Double]) {
-        guard let resource = sound(for: kind, notes: notes) else { return }
         if !entity.components.has(SpatialAudioComponent.self) {
             entity.components.set(SpatialAudioComponent(gain: -4))
         }
-        entity.playAudio(resource)
+        Task { @MainActor in
+            guard let resource = await sound(for: kind, notes: notes) else { return }
+            entity.playAudio(resource)
+        }
     }
 
-    private func sound(for kind: ElementKind, notes: [Double]) -> AudioFileResource? {
+    private func sound(for kind: ElementKind, notes: [Double]) async -> AudioFileResource? {
         if let cached = sounds[kind] { return cached }
         do {
             let url = FileManager.default.temporaryDirectory
                 .appendingPathComponent("torix-reaction-\(kind.rawValue).wav")
             try ToneGenerator.chime(notes: notes).write(to: url, options: .atomic)
-            let resource = try AudioFileResource.load(contentsOf: url)
+            let resource = try await AudioFileResource(contentsOf: url)
             sounds[kind] = resource
             return resource
         } catch {

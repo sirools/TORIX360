@@ -87,7 +87,7 @@ enum DungeonRoomBuilder {
                 // Appareillage décalé : 2 demi-briques une rangée sur deux, 1 brique pleine sinon.
                 let bricks: [(offset: Float, mesh: MeshResource)] = row.isMultiple(of: 2)
                     ? [(-segmentWidth / 4, halfBrick), (segmentWidth / 4, halfBrick)]
-                    : [(0, fullBrick)]
+                    : [(Float(0), fullBrick)]
                 for brick in bricks {
                     let jut = rng.float(0, 0.04)   // certaines pierres dépassent un peu
                     let entity = ModelEntity(mesh: brick.mesh,
@@ -183,14 +183,18 @@ enum DungeonRoomBuilder {
     private static func makeAmbience() -> Entity {
         let entity = Entity()
         entity.name = "Ambience"
-        do {
-            let url = FileManager.default.temporaryDirectory.appendingPathComponent("torix-drone.wav")
-            try ToneGenerator.drone().write(to: url, options: .atomic)
-            let resource = try AudioFileResource.load(contentsOf: url, shouldLoop: true)
-            entity.components.set(AmbientAudioComponent(gain: -22))
-            entity.playAudio(resource)
-        } catch {
-            print("[Ambiance] Bourdon indisponible : \(error)")
+        entity.components.set(AmbientAudioComponent(gain: -22))
+        Task { @MainActor in
+            do {
+                let url = FileManager.default.temporaryDirectory.appendingPathComponent("torix-drone.wav")
+                try ToneGenerator.drone().write(to: url, options: .atomic)
+                var configuration = AudioFileResource.Configuration()
+                configuration.shouldLoop = true
+                let resource = try await AudioFileResource(contentsOf: url, configuration: configuration)
+                entity.playAudio(resource)
+            } catch {
+                print("[Ambiance] Bourdon indisponible : \(error)")
+            }
         }
         return entity
     }
