@@ -4,3 +4,10 @@ node_modules/
 dist/
 .env
 *.log
+# Xcode / visionOS
+xcuserdata/
+*.xcuserstate
+DerivedData/
+.build/
+.swiftpm/
+visionOS/build/

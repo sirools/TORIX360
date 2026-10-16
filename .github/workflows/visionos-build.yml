@@ -1,0 +1,39 @@
+# Vérifie que le projet visionOS compile pour le simulateur (sans signature).
+name: visionOS build
+
+on:
+  push:
+    paths:
+      - "visionOS/**"
+      - ".github/workflows/visionos-build.yml"
+  pull_request:
+    paths:
+      - "visionOS/**"
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: macos-15
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Xcode et SDK disponibles
+        run: |
+          xcodebuild -version
+          xcodebuild -showsdks | grep -i xr || true
+          xcrun simctl list runtimes | grep -i vision || true
+
+      - name: Build simulateur visionOS
+        working-directory: visionOS
+        run: |
+          set -o pipefail
+          xcodebuild \
+            -project TorixDungeon.xcodeproj \
+            -scheme TorixDungeon \
+            -configuration Debug \
+            -destination 'generic/platform=visionOS Simulator' \
+            -derivedDataPath build \
+            CODE_SIGNING_ALLOWED=NO \
+            build 2>&1 | tee build.log | grep -E "error:|warning:|BUILD (SUCCEEDED|FAILED)" || true
+          grep -q "BUILD SUCCEEDED" build.log

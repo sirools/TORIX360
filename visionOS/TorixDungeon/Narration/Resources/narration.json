@@ -1,0 +1,62 @@
+{
+  "title": "Le Donjon sans sortie",
+  "language": "fr-FR",
+  "pauseBetweenSentences": 1.4,
+  "loopDelay": 25,
+  "sentences": [
+    {
+      "id": "s01",
+      "text": "Personne ne sait depuis quand ce donjon existe, ni qui en a scellé les portes.",
+      "audio": "Audio/phrase_01.m4a",
+      "element": "chandelle",
+      "placement": { "angle": -35, "distance": 1.5, "height": 1.0 }
+    },
+    {
+      "id": "s02",
+      "text": "Un jour, un aventurier y oublia un soulier, ocre et mauve, comme une promesse de revenir.",
+      "audio": "Audio/phrase_02.m4a",
+      "element": "soulier",
+      "placement": { "angle": 30, "distance": 1.5, "height": 1.0 }
+    },
+    {
+      "id": "s03",
+      "text": "Un hérisson s'y installa. C'est le seul à connaître tous les couloirs.",
+      "audio": "Audio/phrase_03.m4a",
+      "element": "herisson",
+      "placement": { "angle": -75, "distance": 1.6, "height": 0.45 }
+    },
+    {
+      "id": "s04",
+      "text": "Ici, chaque sort lancé laisse un éclat de lumière qui ne s'éteint jamais.",
+      "audio": "Audio/phrase_04.m4a",
+      "element": "eclatDeSort",
+      "placement": { "angle": 0, "distance": 1.9, "height": 1.55 }
+    },
+    {
+      "id": "s05",
+      "text": "Les clés, elles, apparaissent toujours là où il n'y a aucune serrure.",
+      "audio": "Audio/phrase_05.m4a",
+      "element": "cle",
+      "placement": { "angle": 75, "distance": 1.4, "height": 1.25 }
+    },
+    {
+      "id": "s06",
+      "text": "Un vieux grimoire raconte que la sortie se trouve juste après la dernière phrase.",
+      "audio": "Audio/phrase_06.m4a",
+      "element": "grimoire",
+      "placement": { "angle": 125, "distance": 1.7, "height": 1.15 }
+    },
+    {
+      "id": "s07",
+      "text": "Alors retourne-toi. La voici, la porte.",
+      "audio": "Audio/phrase_07.m4a",
+      "element": "porte",
+      "placement": { "angle": 180, "distance": 2.6, "height": 0.0 }
+    }
+  ],
+  "doorOpenedSentence": {
+    "id": "fin",
+    "text": "La porte s'ouvre… sur un mur. Le donjon n'a pas de sortie. Tout recommence.",
+    "audio": "Audio/fin.m4a"
+  }
+}
