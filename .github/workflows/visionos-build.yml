@@ -20,6 +20,16 @@ jobs:
       matrix:
         # "default" = Xcode par défaut du runner ; "latest" = Xcode le plus récent installé.
         xcode: [default, latest]
+        swift: [projet]
+        include:
+          # Réglages d'un projet créé avec le modèle visionOS d'Xcode 26
+          # (cas d'un import du donjon dans un nouveau projet « TORIX360 »).
+          - xcode: latest
+            swift: modele-xcode26
+            extra: >-
+              SWIFT_DEFAULT_ACTOR_ISOLATION=MainActor
+              SWIFT_APPROACHABLE_CONCURRENCY=YES
+              SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY=YES
     steps:
       - uses: actions/checkout@v4
 
@@ -47,5 +57,6 @@ jobs:
             -destination 'generic/platform=visionOS Simulator' \
             -derivedDataPath build \
             CODE_SIGNING_ALLOWED=NO \
+            ${{ matrix.extra }} \
             build 2>&1 | tee build.log | grep -E "error:|warning:|BUILD (SUCCEEDED|FAILED)" || true
           grep -q "BUILD SUCCEEDED" build.log
