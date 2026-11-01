@@ -21,6 +21,26 @@ Dans le simulateur : clic = pincement, glisser avec Option = tourner la tête
 
 Installation sur le casque : voir [`docs/INSTALL_VISION_PRO.md`](docs/INSTALL_VISION_PRO.md).
 
+## Importer le donjon dans un projet Xcode existant (ex. « TORIX360 »)
+
+Si tu as déjà un projet visionOS qui tourne (créé avec le modèle Xcode, « Hello world »)
+et que tu veux y garder ta signature et ton identifiant d'app :
+
+```bash
+git fetch origin && git checkout claude/visionos-donjon-v0
+visionOS/scripts/importer-dans-projet.sh /chemin/vers/TORIX360/TORIX360
+```
+
+L'argument est le **dossier de sources** de la cible (celui qui contient `TORIX360App.swift`).
+Le script met les fichiers Swift du modèle de côté dans `_modele_sauvegarde_<date>/` (à côté,
+hors compilation), copie `App/`, `Scenes/`, `Narration/`, `Elements/`, `ResourceAccess/`,
+`Assets/*.swift`, et ajoute `DungeonDecor.usda` au paquet RealityKitContent. Il est
+relançable pour récupérer les mises à jour. Ensuite dans Xcode : ⇧⌘K puis ⌘R.
+
+Facultatif, pour le NAS en HTTP : dans l'onglet *Info* de la cible, ajouter
+`App Transport Security Settings › Allows Local Networking = YES` et
+`Privacy - Local Network Usage Description`.
+
 ## Ce qui se passe
 
 | Étape | Où dans le code |
