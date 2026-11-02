@@ -93,11 +93,29 @@ jobs:
             2>&1 | tee build.log | grep -E "error:|BUILD (SUCCEEDED|FAILED)" || true
           grep -q "BUILD SUCCEEDED" build.log
 
+      - name: Vérifier le rôle de scène dans l'Info.plist construit
+        working-directory: visionOS
+        run: |
+          APP=$(find build/Build/Products -name 'TorixDungeon.app' -maxdepth 3 | head -1)
+          ROLE=$(/usr/libexec/PlistBuddy -c 'Print :UIApplicationSceneManifest:UIApplicationPreferredDefaultSceneSessionRole' "$APP/Info.plist")
+          echo "Rôle de scène par défaut : $ROLE"
+          # La fenêtre principale est un volume : tout autre rôle fait planter l'app au lancement.
+          test "$ROLE" = "UIWindowSceneSessionRoleVolumetricApplication"
+
       - name: Lancer l'app et vérifier qu'elle tourne encore après 30 s
         working-directory: visionOS
         run: |
           APP=$(find build/Build/Products -name 'TorixDungeon.app' -maxdepth 3 | head -1)
           BUNDLE_ID=$(/usr/libexec/PlistBuddy -c 'Print CFBundleIdentifier' "$APP/Info.plist")
+
+          # Témoin : si même une app système ne se lance pas, le simulateur sans écran
+          # de la CI ne sait pas lancer d'apps et le test n'est pas concluant.
+          if ! xcrun simctl launch "$UDID" com.apple.Preferences; then
+            echo "::warning::Le simulateur de la CI ne lance aucune app (même Réglages) : test de lancement non concluant."
+            exit 0
+          fi
+          xcrun simctl terminate "$UDID" com.apple.Preferences || true
+
           xcrun simctl install "$UDID" "$APP"
           xcrun simctl launch --stdout=launch.log --stderr=launch.log "$UDID" "$BUNDLE_ID"
           sleep 30
