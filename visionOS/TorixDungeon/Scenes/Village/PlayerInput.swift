@@ -1,4 +1,5 @@
 import GameController
+import simd
 
 /// Lit le clavier (Bluetooth, ou celui du Mac dans le simulateur) et la manette (PS5 / Xbox)
 /// à chaque image.

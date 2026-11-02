@@ -104,7 +104,7 @@ struct VillageMapView: View {
         VStack(alignment: .leading, spacing: 10) {
             Label("Clairière de Bruyère", systemImage: "map.fill").font(.title3).bold()
             Canvas { context, size in
-                let scale = size.width / (world.layout.walkableRadius * 2 + 4)
+                let scale = Float(size.width) / (world.layout.walkableRadius * 2 + 4)
                 let center = CGPoint(x: size.width / 2, y: size.height / 2)
                 func point(_ p: SIMD2<Float>) -> CGPoint {
                     CGPoint(x: center.x + CGFloat(p.x * scale), y: center.y + CGFloat(p.y * scale))

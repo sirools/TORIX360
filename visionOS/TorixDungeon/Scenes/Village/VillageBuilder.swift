@@ -149,9 +149,7 @@ enum VillageBuilder {
 
         // Soleil (avec ombres) + lumière d'appoint douce venant du ciel opposé.
         let sun = Entity()
-        var sunLight = DirectionalLightComponent(color: UIColor(hex: 0xFFF1D0), intensity: 5000)
-        sunLight.isRealWorldProxy = false
-        sun.components.set(sunLight)
+        sun.components.set(DirectionalLightComponent(color: UIColor(hex: 0xFFF1D0), intensity: 5000))
         sun.components.set(DirectionalLightComponent.Shadow(maximumDistance: 25, depthBias: 2))
         sun.look(at: .zero, from: sunDirection * 20, relativeTo: nil)
         group.addChild(sun)
