@@ -65,6 +65,13 @@ jobs:
   smoke-test:
     runs-on: macos-15
     timeout-minutes: 40
+    strategy:
+      fail-fast: false
+      matrix:
+        # "corrige" : l'app doit tourner. "temoin-ancien-role" : on remet l'ancien rôle de scène
+        # (fenêtre 2D) dans l'app construite ; elle DOIT planter, sinon le test ne prouve rien.
+        variante: [corrige, temoin-ancien-role]
+    name: smoke-test (${{ matrix.variante }})
     steps:
       - uses: actions/checkout@v4
 
@@ -89,7 +96,8 @@ jobs:
         run: |
           set -o pipefail
           xcodebuild -project TorixDungeon.xcodeproj -scheme TorixDungeon -configuration Debug \
-            -destination "id=$UDID" -derivedDataPath build CODE_SIGNING_ALLOWED=NO build \
+            -destination "id=$UDID" -derivedDataPath build \
+            CODE_SIGN_STYLE=Manual CODE_SIGN_IDENTITY=- DEVELOPMENT_TEAM= build \
             2>&1 | tee build.log | grep -E "error:|BUILD (SUCCEEDED|FAILED)" || true
           grep -q "BUILD SUCCEEDED" build.log
 
@@ -99,6 +107,7 @@ jobs:
           APP=$(find build/Build/Products -name 'TorixDungeon.app' -maxdepth 3 | head -1)
           ROLE=$(/usr/libexec/PlistBuddy -c 'Print :UIApplicationSceneManifest:UIApplicationPreferredDefaultSceneSessionRole' "$APP/Info.plist")
           echo "Rôle de scène par défaut : $ROLE"
+          codesign -dv "$APP" 2>&1 | grep -E "Signature|Identifier" || true
           # La fenêtre principale est un volume : tout autre rôle fait planter l'app au lancement.
           test "$ROLE" = "UIWindowSceneSessionRoleVolumetricApplication"
 
@@ -116,14 +125,27 @@ jobs:
           fi
           xcrun simctl terminate "$UDID" com.apple.Preferences || true
 
+          if [ "${{ matrix.variante }}" = "temoin-ancien-role" ]; then
+            /usr/libexec/PlistBuddy -c 'Set :UIApplicationSceneManifest:UIApplicationPreferredDefaultSceneSessionRole UIWindowSceneSessionRoleApplication' "$APP/Info.plist"
+            codesign --force --sign - "$APP"
+            EXPECT=crash
+          else
+            EXPECT=running
+          fi
+
           xcrun simctl install "$UDID" "$APP"
-          xcrun simctl launch --stdout=launch.log --stderr=launch.log "$UDID" "$BUNDLE_ID"
+          xcrun simctl launch --stdout="$PWD/launch.log" --stderr="$PWD/launch.log" "$UDID" "$BUNDLE_ID" || echo "simctl launch a échoué"
           sleep 30
           echo "--- Sortie de l'app ---"; cat launch.log || true
+
           if xcrun simctl spawn "$UDID" launchctl list | grep "$BUNDLE_ID" | awk '{print $1}' | grep -qE '^[0-9]+$'; then
-            echo "L'app tourne toujours après 30 s."
+            RESULT=running
           else
-            echo "::error::L'app n'est plus en cours d'exécution (plantage au démarrage ?)"
+            RESULT=crash
+          fi
+          echo "Attendu : $EXPECT / Obtenu : $RESULT"
+          if [ "$RESULT" != "$EXPECT" ]; then
+            echo "::error::Résultat inattendu (attendu $EXPECT, obtenu $RESULT)"
             find ~/Library/Logs/DiagnosticReports -name 'TorixDungeon*' -newer build.log -exec head -60 {} \; 2>/dev/null || true
             exit 1
           fi
@@ -135,7 +157,7 @@ jobs:
       - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: smoke-test
+          name: smoke-test-${{ matrix.variante }}
           path: |
             visionOS/simulateur.png
             visionOS/launch.log
