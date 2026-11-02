@@ -7,6 +7,7 @@ import SwiftUI
 final class AppModel {
     static let launchWindowID = "launch"
     static let immersiveSpaceID = "dungeon"
+    static let villageSpaceID = "village"
 
     enum ImmersiveSpaceState {
         case closed
@@ -52,6 +53,8 @@ final class AppModel {
     }
 
     var immersiveSpaceState: ImmersiveSpaceState = .closed
+    /// Espace immersif actuellement ouvert (donjon ou village).
+    var openSpaceID: String?
     var immersionChoice: ImmersionChoice = .mixed
     var voiceChoice: VoiceChoice = .recorded
 

@@ -19,14 +19,17 @@ enum ElementFactory {
     /// Construit l'élément, le place face à l'utilisateur et le rend interactif
     /// (regard + pincement). Il commence invisible : `LevitationSystem` gère le fondu.
     static func make(_ kind: ElementKind, at placement: Placement) -> Entity {
+        // Face avant (+Z) tournée vers l'utilisateur, au centre de la salle.
+        let position = placement.position
+        return make(kind, position: position, orientation: Primitives.yaw(atan2(-position.x, -position.z)))
+    }
+
+    /// Variante libre : position et orientation quelconques (ex. objets à ramasser dans le village).
+    static func make(_ kind: ElementKind, position: SIMD3<Float>, orientation: simd_quatf) -> Entity {
         let element = type(for: kind)
         let root = Entity()
         root.name = "Element.\(kind.rawValue)"
         root.addChild(element.makeModel())
-
-        // Face avant (+Z) tournée vers l'utilisateur, au centre de la salle.
-        let position = placement.position
-        let orientation = Primitives.yaw(atan2(-position.x, -position.z))
         root.position = position
         root.orientation = orientation
 

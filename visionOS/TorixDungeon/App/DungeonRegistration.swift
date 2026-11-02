@@ -9,6 +9,8 @@ enum DungeonRegistration {
         FlickerComponent.registerComponent()
         TileComponent.registerComponent()
         CreatureComponent.registerComponent()
+        GroundComponent.registerComponent()
+        PortalLinkComponent.registerComponent()
 
         LevitationSystem.registerSystem()
         FlickerSystem.registerSystem()

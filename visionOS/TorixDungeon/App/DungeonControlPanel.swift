@@ -15,7 +15,7 @@ struct DungeonControlPanel: View {
         @Bindable var appModel = appModel
 
         VStack(spacing: 14) {
-            Text("Le Donjon sans sortie")
+            Text("TORIX · Monde à explorer")
                 .font(.title)
                 .bold()
 
@@ -27,16 +27,12 @@ struct DungeonControlPanel: View {
                 .animation(.easeInOut, value: board.status)
 
             HStack(spacing: 12) {
-                Button {
-                    Task { await toggleDungeon() }
-                } label: {
-                    Label(appModel.immersiveSpaceState == .open ? "Quitter le donjon" : "Entrer dans le donjon",
-                          systemImage: appModel.immersiveSpaceState == .open ? "door.left.hand.open" : "door.left.hand.closed")
-                        .font(.title3)
-                        .padding(.horizontal, 8)
-                }
-                .buttonStyle(.borderedProminent)
-                .disabled(appModel.immersiveSpaceState == .inTransition)
+                spaceButton(id: AppModel.villageSpaceID,
+                            title: "Explorer le village",
+                            symbol: "figure.walk")
+                spaceButton(id: AppModel.immersiveSpaceID,
+                            title: "Entrer dans le donjon",
+                            symbol: "door.left.hand.closed")
 
                 Button {
                     showsSettings.toggle()
@@ -76,7 +72,23 @@ struct DungeonControlPanel: View {
         .glassBackgroundEffect()
     }
 
-    private func toggleDungeon() async {
+    /// Bouton d'ouverture / fermeture d'un espace immersif.
+    @ViewBuilder
+    private func spaceButton(id: String, title: String, symbol: String) -> some View {
+        let isOpen = appModel.openSpaceID == id
+        Button {
+            Task { await toggle(spaceID: id) }
+        } label: {
+            Label(isOpen ? "Quitter" : title, systemImage: isOpen ? "xmark.circle" : symbol)
+                .font(.title3)
+                .padding(.horizontal, 6)
+        }
+        .buttonStyle(.borderedProminent)
+        .disabled(appModel.immersiveSpaceState == .inTransition
+                  || (appModel.openSpaceID != nil && !isOpen))
+    }
+
+    private func toggle(spaceID: String) async {
         switch appModel.immersiveSpaceState {
         case .open:
             appModel.immersiveSpaceState = .inTransition
@@ -85,7 +97,7 @@ struct DungeonControlPanel: View {
 
         case .closed:
             appModel.immersiveSpaceState = .inTransition
-            switch await openImmersiveSpace(id: AppModel.immersiveSpaceID) {
+            switch await openImmersiveSpace(id: spaceID) {
             case .opened:
                 // L'état passe à `.open` dans le `onAppear` de l'espace immersif.
                 break

@@ -37,6 +37,51 @@ enum ToneGenerator {
         return wav(normalized(samples, peak: 0.45))
     }
 
+    /// Ambiance de clairière : léger souffle de vent et gazouillis (glissandos aigus) épars.
+    /// Boucle de 12 s, déterministe.
+    static func birds(duration: Double = 12) -> Data {
+        let count = Int(duration * sampleRate)
+        var samples = [Float](repeating: 0, count: count)
+        var state: UInt64 = 0x2545_F491_4F6C_DD1D
+        func random() -> Double {
+            state ^= state << 13; state ^= state >> 7; state ^= state << 17
+            return Double(state % 1_000_000) / 1_000_000
+        }
+
+        // Vent : bruit filtré (passe-bas simple), qui respire.
+        var low: Double = 0
+        for n in 0..<count {
+            let t = Double(n) / sampleRate
+            low += (random() * 2 - 1 - low) * 0.02
+            let breath = 0.6 + 0.4 * sin(2 * .pi * t / duration)
+            samples[n] = Float(low * 0.35 * breath)
+        }
+
+        // Gazouillis : petites séries de notes qui glissent.
+        for _ in 0..<14 {
+            let start = random() * (duration - 1)
+            let base = 2200 + random() * 1800
+            let notes = 2 + Int(random() * 4)
+            for note in 0..<notes {
+                let noteStart = start + Double(note) * 0.11
+                let length = 0.07 + random() * 0.05
+                let first = Int(noteStart * sampleRate)
+                let last = min(Int((noteStart + length) * sampleRate), count)
+                guard first < last else { continue }
+                var phase: Double = 0
+                for n in first..<last {
+                    let t = Double(n - first) / sampleRate
+                    let k = t / length
+                    let frequency = base * (1 + 0.35 * sin(k * .pi)) + Double(note) * 120
+                    phase += 2 * .pi * frequency / sampleRate
+                    let envelope = sin(k * .pi)
+                    samples[n] += Float(0.5 * envelope * sin(phase))
+                }
+            }
+        }
+        return wav(normalized(samples, peak: 0.5))
+    }
+
     // MARK: - WAV PCM 16 bits mono
 
     private static func normalized(_ samples: [Float], peak: Float) -> [Float] {

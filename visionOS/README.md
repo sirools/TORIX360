@@ -24,6 +24,27 @@ Dans le simulateur : clic = pincement, glisser avec Option = tourner la tête
 
 Installation sur le casque : voir [`docs/INSTALL_VISION_PRO.md`](docs/INSTALL_VISION_PRO.md).
 
+## Explorer le village à la première personne (Clairière de Bruyère)
+
+Sur le panneau du diorama : **Explorer le village**. Immersion totale, tu es Sirools, à
+hauteur d'yeux, dans un village original (aucun asset ni décor repris d'un jeu existant).
+
+| Action | Clavier | Manette | Mains |
+|---|---|---|---|
+| Marcher (dans la direction du regard) | Z Q S D (AZERTY) ou flèches ↑↓ | stick gauche | — |
+| Courir | Maj | clic stick gauche | — |
+| Pivoter de 30° | ← → | stick droit | tourner la tête / le corps |
+| Se téléporter | — | — | pincer le sol (portail, 12 m max) |
+| Portail de pierre | — | — | le pincer : bout du chemin nord |
+| Sorts (Braise, Ondée, Ronce, Étincelle, Poussière d'étoile, Portail) | 1 à 6 | A, X, RB, LB | — |
+| Inventaire / carte | I / M | Y / B | — |
+| Ramasser un objet | s'en approcher | | le pincer |
+
+Dans le simulateur, les touches ZQSD peuvent être prises par la navigation de la caméra :
+utilise les flèches, ou active *I/O › Keyboard › Send Keyboard Input to Device*.
+Code : `Scenes/Village/` (`VillageBuilder` = décor, `VillageWorld` = gameplay,
+`PlayerInput` = clavier/manette, `GameHUD` = interface, `VillageImmersiveView` = assemblage).
+
 ## Installer tout le projet dans un dossier local (une seule commande)
 
 Dans le Terminal, depuis le dossier voulu (vide, ou contenant déjà ton projet Xcode) :

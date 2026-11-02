@@ -61,4 +61,14 @@ extension Entity {
         }
         return nil
     }
+
+    /// Vrai si l'entité est `ancestor` ou l'un de ses descendants.
+    func isSelf(orDescendantOf ancestor: Entity) -> Bool {
+        var current: Entity? = self
+        while let entity = current {
+            if entity === ancestor { return true }
+            current = entity.parent
+        }
+        return false
+    }
 }
