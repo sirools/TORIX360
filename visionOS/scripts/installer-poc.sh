@@ -26,8 +26,12 @@ if [ -d "$TARGET/.git" ] && [ -d "$TARGET/visionOS" ]; then
 elif [ -d "$TARGET/TORIX360-repo/.git" ]; then
     REPO="$TARGET/TORIX360-repo"
 elif [ -z "$(ls -A "$TARGET" | grep -v "^.DS_Store$" || true)" ]; then
+    # Dossier vide (à part un éventuel .DS_Store) : on clone sur place.
     REPO="$TARGET"
-    git clone --branch "$BRANCH" "$REPO_URL" "$REPO"
+    git -C "$REPO" init -q
+    git -C "$REPO" remote add origin "$REPO_URL"
+    git -C "$REPO" fetch -q origin "$BRANCH"
+    git -C "$REPO" checkout -q -b "$BRANCH" --track "origin/$BRANCH"
 else
     REPO="$TARGET/TORIX360-repo"
     git clone --branch "$BRANCH" "$REPO_URL" "$REPO"
