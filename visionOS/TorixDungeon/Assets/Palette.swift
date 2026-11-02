@@ -33,6 +33,19 @@ enum Palette {
     static let hedgehogSpikes = UIColor(hex: 0x3B2A1E)
     static let hedgehogSnout = UIColor(hex: 0xDCC4A4)
     static let black = UIColor(hex: 0x0B0A0A)
+
+    // Plateau tactique (diorama)
+    static let grassLight = UIColor(hex: 0x86B556)
+    static let grassDark = UIColor(hex: 0x6E9C45)
+    static let dirt = UIColor(hex: 0x6B4A2E)
+    static let dirtDark = UIColor(hex: 0x47301D)
+    static let rock = UIColor(hex: 0x8C8781)
+    static let leaf = UIColor(hex: 0x3F7A3A)
+    static let leafLight = UIColor(hex: 0x5A9A4C)
+    static let skin = UIColor(hex: 0xE8C39E)
+    static let reachable = UIColor(hex: 0x4FA3E0)
+    static let heroRing = UIColor(hex: 0x4FA3E0)
+    static let enemyRing = UIColor(hex: 0xD9534F)
 }
 
 extension UIColor {

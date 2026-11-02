@@ -2,7 +2,7 @@ import SwiftUI
 
 /// Point d'entrée de l'app.
 ///
-/// - Une petite fenêtre de lancement (`LaunchView`) avec le bouton « Entrer dans le donjon ».
+/// - Une fenêtre en volume (`ContentView`) : diorama tactique façon Dofus + bouton « Entrer dans le donjon ».
 /// - Un espace immersif (`DungeonImmersiveView`) qui contient la salle et la narration.
 @main
 struct TorixDungeonApp: App {
@@ -15,10 +15,11 @@ struct TorixDungeonApp: App {
 
     var body: some Scene {
         WindowGroup(id: AppModel.launchWindowID) {
-            LaunchView()
+            ContentView()
                 .environment(appModel)
         }
-        .windowResizability(.contentSize)
+        .windowStyle(.volumetric)
+        .defaultSize(width: 0.8, height: 0.6, depth: 0.8, in: .meters)
 
         ImmersiveSpace(id: AppModel.immersiveSpaceID) {
             DungeonImmersiveView()

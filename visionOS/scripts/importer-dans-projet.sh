@@ -3,10 +3,10 @@
 # par exemple un projet « TORIX360 » créé avec le modèle visionOS d'Xcode.
 #
 # Usage (depuis la racine du dépôt) :
-#   visionOS/scripts/importer-dans-projet.sh /chemin/vers/TORIX360/TORIX360
+#   visionOS/scripts/importer-dans-projet.sh /chemin/vers/TORIX360
 #
-# L'argument est le DOSSIER DE SOURCES de la cible : celui qui contient
-# TORIX360App.swift, ContentView.swift, Assets.xcassets…
+# L'argument est soit le dossier qui contient TORIX360.xcodeproj, soit directement
+# le DOSSIER DE SOURCES de la cible (celui qui contient TORIX360App.swift, ContentView.swift…).
 #
 # Ce que fait le script :
 #   1. met de côté les fichiers Swift du modèle (Hello world) dans un dossier de
@@ -33,6 +33,17 @@ if [ ! -d "$1" ]; then
     exit 1
 fi
 DEST="$(cd "$1" && pwd)"
+
+# Dossier du .xcodeproj donné ? Les sources sont dans le sous-dossier du même nom.
+XCODEPROJ=$(find "$DEST" -maxdepth 1 -name '*.xcodeproj' | head -1)
+if [ -n "$XCODEPROJ" ]; then
+    NAME="$(basename "$XCODEPROJ" .xcodeproj)"
+    if [ ! -d "$DEST/$NAME" ]; then
+        echo "Dossier de sources introuvable : $DEST/$NAME" >&2
+        exit 1
+    fi
+    DEST="$DEST/$NAME"
+fi
 PROJECT_ROOT="$(dirname "$DEST")"
 
 if [ "$DEST" = "$SOURCE" ]; then

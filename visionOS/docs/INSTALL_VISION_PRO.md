@@ -22,8 +22,9 @@ Une équipe « *Ton Nom (Personal Team)* » apparaît.
 1. Ouvrir `visionOS/TorixDungeon.xcodeproj`.
 2. Sélectionner le projet › cible **TorixDungeon** › onglet **Signing & Capabilities**.
 3. Cocher **Automatically manage signing**, choisir ta **Personal Team** dans *Team*.
-4. **Bundle Identifier** : il doit être unique au monde. Remplacer `com.torix360.donjon` par
-   quelque chose de personnel, ex. `com.tonpseudo.torix360.donjon`.
+4. **Bundle Identifier** : `sirools.TORIX360` (le même que ton projet de test, déjà accepté
+   par Xcode avec ta Personal Team). Il doit être unique au monde : en cas de refus, en
+   choisir un autre, ex. `sirools.torix360.donjon`.
    (Message « Failed to register bundle identifier » = identifiant déjà pris → en changer.)
 
 ## 3. Activer le mode développeur et appairer le casque

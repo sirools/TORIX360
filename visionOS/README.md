@@ -14,28 +14,38 @@ autour de soi (chandelle, soulier ocre et mauve, hérisson, éclat de sort, clé
    (Xcode › Settings › Components).
 2. Ouvrir `visionOS/TorixDungeon.xcodeproj`.
 3. Destination : *Apple Vision Pro* (simulateur), puis **⌘R**.
-4. Dans la fenêtre : choisir *Mixte* ou *Totale*, puis **Entrer dans le donjon**.
+4. Un **diorama tactique** apparaît dans un volume devant toi : île flottante, damier d'herbe,
+   arbres, rochers, ton aventurier (cercle bleu) et un hérisson (cercle rouge). Pince une case
+   bleue pour te déplacer (3 PM), pince le hérisson à portée (5 cases) pour lancer un sort.
+5. Sur le panneau : **Entrer dans le donjon** (réglages Mixte/Totale et voix sous l'icône ⚙︎).
 
 Dans le simulateur : clic = pincement, glisser avec Option = tourner la tête
 (le menu *Device › Reset Camera* recentre la vue). La porte apparaît **derrière** toi.
 
 Installation sur le casque : voir [`docs/INSTALL_VISION_PRO.md`](docs/INSTALL_VISION_PRO.md).
 
-## Importer le donjon dans un projet Xcode existant (ex. « TORIX360 »)
+## Installer tout le projet dans un dossier local (une seule commande)
 
-Si tu as déjà un projet visionOS qui tourne (créé avec le modèle Xcode, « Hello world »)
-et que tu veux y garder ta signature et ton identifiant d'app :
+Dans le Terminal, depuis le dossier voulu (vide, ou contenant déjà ton projet Xcode) :
 
 ```bash
-git fetch origin && git checkout claude/visionos-donjon-v0
-visionOS/scripts/importer-dans-projet.sh /chemin/vers/TORIX360/TORIX360
+cd ~/TORIX/POC_Ankama_Dofus_VR
+curl -fsSL https://raw.githubusercontent.com/sirools/TORIX360/claude/visionos-donjon-v0/visionOS/scripts/installer-poc.sh | bash
 ```
 
-L'argument est le **dossier de sources** de la cible (celui qui contient `TORIX360App.swift`).
-Le script met les fichiers Swift du modèle de côté dans `_modele_sauvegarde_<date>/` (à côté,
-hors compilation), copie `App/`, `Scenes/`, `Narration/`, `Elements/`, `ResourceAccess/`,
-`Assets/*.swift`, et ajoute `DungeonDecor.usda` au paquet RealityKitContent. Il est
-relançable pour récupérer les mises à jour. Ensuite dans Xcode : ⇧⌘K puis ⌘R.
+Le script ([`scripts/installer-poc.sh`](scripts/installer-poc.sh)) :
+
+1. clone le dépôt dans ce dossier (ou dans `TORIX360-repo/` si le dossier n'est pas vide) ;
+   relancé plus tard, il récupère simplement les mises à jour ;
+2. s'il trouve **ton** projet Xcode dans le dossier (ex. `TORIX360` créé avec le modèle
+   visionOS, celui du « Hello world »), il y importe le code : les fichiers Swift du modèle
+   (dont l'ancien `ContentView.swift`) sont mis de côté dans `_modele_sauvegarde_<date>/`,
+   hors compilation, et remplacés par ceux du POC ;
+3. ouvre le projet dans Xcode. Il reste à choisir ta *Team* dans *Signing & Capabilities*,
+   puis ⇧⌘K et ⌘R.
+
+Import manuel dans un projet existant :
+`visionOS/scripts/importer-dans-projet.sh /chemin/vers/le/dossier/du/xcodeproj`.
 
 Facultatif, pour le NAS en HTTP : dans l'onglet *Info* de la cible, ajouter
 `App Transport Security Settings › Allows Local Networking = YES` et
@@ -45,7 +55,10 @@ Facultatif, pour le NAS en HTTP : dans l'onglet *Info* de la cible, ajouter
 
 | Étape | Où dans le code |
 |---|---|
-| Fenêtre d'accueil, choix immersion/voix/NAS | `App/LaunchView.swift`, `App/AppModel.swift` |
+| Fenêtre principale en volume (diorama) | `App/ContentView.swift` |
+| Plateau tactique : cases, PM, chemin, sort, fuite | `Scenes/Tactical/TacticalBoard.swift` |
+| Île, dalles, décor, personnages du plateau | `Scenes/Tactical/TacticalBoardBuilder.swift`, `Elements/HeroModel.swift` |
+| Panneau : consigne, entrée du donjon, réglages | `App/DungeonControlPanel.swift`, `App/AppModel.swift` |
 | Ouverture de l'espace immersif `mixed` / `full` | `App/TorixDungeonApp.swift` |
 | Salle : dallage, murs de briques, plafond, 4 torches vacillantes, brume, bourdon | `Scenes/Dungeon/DungeonRoomBuilder.swift` |
 | Lecture phrase par phrase + attente de la porte + boucle | `Narration/NarrationSequencer.swift` |

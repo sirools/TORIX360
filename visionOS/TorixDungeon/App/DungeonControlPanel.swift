@@ -1,68 +1,79 @@
 import SwiftUI
 
-/// Fenêtre d'accueil : quelques réglages et le bouton pour entrer (ou sortir) du donjon.
-struct LaunchView: View {
+/// Panneau flottant au-dessus du plateau : consigne du combat, réglages,
+/// et le bouton pour entrer dans le donjon immersif.
+struct DungeonControlPanel: View {
+    let board: TacticalBoard
+
     @Environment(AppModel.self) private var appModel
     @Environment(\.openImmersiveSpace) private var openImmersiveSpace
     @Environment(\.dismissImmersiveSpace) private var dismissImmersiveSpace
 
+    @State private var showsSettings = false
+
     var body: some View {
         @Bindable var appModel = appModel
 
-        VStack(spacing: 28) {
-            VStack(spacing: 8) {
-                Text("Le Donjon sans sortie")
-                    .font(.extraLargeTitle2)
-                Text("Écoute. Chaque phrase fait apparaître quelque chose.")
-                    .font(.title3)
-                    .foregroundStyle(.secondary)
+        VStack(spacing: 14) {
+            Text("Le Donjon sans sortie")
+                .font(.title)
+                .bold()
+
+            Text(board.status)
+                .font(.headline)
+                .multilineTextAlignment(.center)
+                .foregroundStyle(.secondary)
+                .frame(minHeight: 44)
+                .animation(.easeInOut, value: board.status)
+
+            HStack(spacing: 12) {
+                Button {
+                    Task { await toggleDungeon() }
+                } label: {
+                    Label(appModel.immersiveSpaceState == .open ? "Quitter le donjon" : "Entrer dans le donjon",
+                          systemImage: appModel.immersiveSpaceState == .open ? "door.left.hand.open" : "door.left.hand.closed")
+                        .font(.title3)
+                        .padding(.horizontal, 8)
+                }
+                .buttonStyle(.borderedProminent)
+                .disabled(appModel.immersiveSpaceState == .inTransition)
+
+                Button {
+                    showsSettings.toggle()
+                } label: {
+                    Image(systemName: "slider.horizontal.3")
+                }
+                .help("Réglages")
             }
 
-            VStack(alignment: .leading, spacing: 16) {
-                LabeledContent("Immersion") {
+            if showsSettings {
+                VStack(alignment: .leading, spacing: 10) {
                     Picker("Immersion", selection: $appModel.immersionChoice) {
                         ForEach(AppModel.ImmersionChoice.allCases) { choice in
                             Text(choice.label).tag(choice)
                         }
                     }
                     .pickerStyle(.segmented)
-                    .frame(width: 260)
-                }
 
-                LabeledContent("Voix") {
                     Picker("Voix", selection: $appModel.voiceChoice) {
                         ForEach(AppModel.VoiceChoice.allCases) { choice in
                             Text(choice.label).tag(choice)
                         }
                     }
                     .pickerStyle(.segmented)
-                    .frame(width: 260)
-                }
 
-                LabeledContent("NAS (optionnel)") {
-                    TextField("http://nas.local:8080/torix", text: $appModel.nasBaseURLString)
+                    TextField("NAS (optionnel) : http://nas.local:8080/torix", text: $appModel.nasBaseURLString)
                         .textFieldStyle(.roundedBorder)
                         .keyboardType(.URL)
                         .textInputAutocapitalization(.never)
                         .autocorrectionDisabled()
-                        .frame(width: 260)
                 }
+                .disabled(appModel.immersiveSpaceState != .closed)
             }
-            .disabled(appModel.immersiveSpaceState != .closed)
-
-            Button {
-                Task { await toggleDungeon() }
-            } label: {
-                Text(appModel.immersiveSpaceState == .open ? "Quitter le donjon" : "Entrer dans le donjon")
-                    .font(.title2)
-                    .padding(.horizontal, 24)
-                    .padding(.vertical, 8)
-            }
-            .buttonStyle(.borderedProminent)
-            .disabled(appModel.immersiveSpaceState == .inTransition)
         }
-        .padding(48)
-        .frame(width: 620)
+        .padding(28)
+        .frame(width: 560)
+        .glassBackgroundEffect()
     }
 
     private func toggleDungeon() async {
@@ -88,9 +99,4 @@ struct LaunchView: View {
             break
         }
     }
-}
-
-#Preview(windowStyle: .automatic) {
-    LaunchView()
-        .environment(AppModel())
 }
