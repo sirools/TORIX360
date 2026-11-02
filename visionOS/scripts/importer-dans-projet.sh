@@ -89,6 +89,17 @@ if [ -n "$RKASSETS" ] && [ -f "$DECOR" ]; then
     echo "Copié : DungeonDecor.usda → ${RKASSETS#"$PROJECT_ROOT"/}"
 fi
 
+# 4. La fenêtre principale est un volume : le rôle de scène par défaut doit le dire,
+#    sinon crash au lancement (« no scenes declared in your app body match this role »).
+{ find "$PROJECT_ROOT" -maxdepth 3 -name 'Info.plist' -not -path '*/_modele_sauvegarde_*' -not -path '*/build/*';
+  find "$PROJECT_ROOT" -maxdepth 2 -name 'project.pbxproj'; } 2>/dev/null |
+while IFS= read -r file; do
+    if grep -q 'UIWindowSceneSessionRoleApplication' "$file"; then
+        perl -pi -e 's/UIWindowSceneSessionRoleApplication/UIWindowSceneSessionRoleVolumetricApplication/g' "$file"
+        echo "Rôle de scène passé en « volume » : ${file#"$PROJECT_ROOT"/}"
+    fi
+done
+
 # Info.plist dans le dossier de sources = erreur « Multiple commands produce …/Info.plist ».
 if [ -f "$DEST/Info.plist" ]; then
     echo
